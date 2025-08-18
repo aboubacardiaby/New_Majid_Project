@@ -1,0 +1,361 @@
+@model AdminSettingsViewModel
+@{
+    ViewData["Title"] = "Settings";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-2 text-gray-800">
+            <i class="fas fa-cog me-2"></i>Website Settings
+        </h1>
+        <p class="mb-4">Manage your website configuration and settings.</p>
+    </div>
+</div>
+
+<!-- Settings Tabs -->
+<ul class="nav nav-tabs mb-4" id="settingsTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="site-info-tab" data-bs-toggle="tab" data-bs-target="#site-info" type="button" role="tab">
+            <i class="fas fa-info-circle me-2"></i>Site Information
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="social-media-tab" data-bs-toggle="tab" data-bs-target="#social-media" type="button" role="tab">
+            <i class="fas fa-share-alt me-2"></i>Social Media
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="email-settings-tab" data-bs-toggle="tab" data-bs-target="#email-settings" type="button" role="tab">
+            <i class="fas fa-envelope me-2"></i>Email Settings
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="paypal-settings-tab" data-bs-toggle="tab" data-bs-target="#paypal-settings" type="button" role="tab">
+            <i class="fab fa-paypal me-2"></i>PayPal Settings
+        </button>
+    </li>
+</ul>
+
+<!-- Tab Content -->
+<div class="tab-content" id="settingsTabContent">
+    <!-- Site Information Tab -->
+    <div class="tab-pane fade show active" id="site-info" role="tabpanel">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-info-circle me-2"></i>Site Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="UpdateSiteInfo" method="post">
+                    @Html.AntiForgeryToken()
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="SiteInfo.SiteName" class="form-label">Site Name *</label>
+                                <input asp-for="SiteInfo.SiteName" class="form-control" placeholder="Your website name" />
+                                <span asp-validation-for="SiteInfo.SiteName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="SiteInfo.ImamName" class="form-label">Imam Name</label>
+                                <input asp-for="SiteInfo.ImamName" class="form-control" placeholder="Name of the community imam" />
+                                <span asp-validation-for="SiteInfo.ImamName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="SiteInfo.SiteDescription" class="form-label">Site Description</label>
+                        <textarea asp-for="SiteInfo.SiteDescription" class="form-control" rows="3" placeholder="Brief description of your community"></textarea>
+                        <span asp-validation-for="SiteInfo.SiteDescription" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="SiteInfo.ContactEmail" class="form-label">Contact Email</label>
+                                <input asp-for="SiteInfo.ContactEmail" type="email" class="form-control" placeholder="info@example.com" />
+                                <span asp-validation-for="SiteInfo.ContactEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="SiteInfo.ContactPhone" class="form-label">Contact Phone</label>
+                                <input asp-for="SiteInfo.ContactPhone" class="form-control" placeholder="(555) 123-4567" />
+                                <span asp-validation-for="SiteInfo.ContactPhone" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4 mb-3">Address Information</h6>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group mb-3">
+                                <label asp-for="SiteInfo.Address" class="form-label">Street Address</label>
+                                <input asp-for="SiteInfo.Address" class="form-control" placeholder="123 Main Street" />
+                                <span asp-validation-for="SiteInfo.Address" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="SiteInfo.City" class="form-label">City</label>
+                                <input asp-for="SiteInfo.City" class="form-control" placeholder="Minneapolis" />
+                                <span asp-validation-for="SiteInfo.City" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label asp-for="SiteInfo.State" class="form-label">State</label>
+                                <input asp-for="SiteInfo.State" class="form-control" placeholder="MN" />
+                                <span asp-validation-for="SiteInfo.State" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label asp-for="SiteInfo.ZipCode" class="form-label">ZIP Code</label>
+                                <input asp-for="SiteInfo.ZipCode" class="form-control" placeholder="55401" />
+                                <span asp-validation-for="SiteInfo.ZipCode" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label asp-for="SiteInfo.LogoUrl" class="form-label">Logo URL</label>
+                        <input asp-for="SiteInfo.LogoUrl" class="form-control" placeholder="/images/logo.png" />
+                        <small class="form-text text-muted">Path to your community logo image</small>
+                        <span asp-validation-for="SiteInfo.LogoUrl" class="text-danger"></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Site Information
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Media Tab -->
+    <div class="tab-pane fade" id="social-media" role="tabpanel">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-share-alt me-2"></i>Social Media Settings
+                </h6>
+            </div>
+            <div class="card-body">
+                <form asp-action="UpdateSocialMedia" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="SocialMedia.FacebookUrl" class="form-label">
+                                    <i class="fab fa-facebook text-primary me-2"></i>Facebook Page URL
+                                </label>
+                                <input asp-for="SocialMedia.FacebookUrl" class="form-control" placeholder="https://facebook.com/yourpage" />
+                                <span asp-validation-for="SocialMedia.FacebookUrl" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="SocialMedia.InstagramUrl" class="form-label">
+                                    <i class="fab fa-instagram text-danger me-2"></i>Instagram Page URL
+                                </label>
+                                <input asp-for="SocialMedia.InstagramUrl" class="form-control" placeholder="https://instagram.com/yourpage" />
+                                <span asp-validation-for="SocialMedia.InstagramUrl" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="SocialMedia.WhatsAppNumber" class="form-label">
+                                    <i class="fab fa-whatsapp text-success me-2"></i>WhatsApp Number
+                                </label>
+                                <input asp-for="SocialMedia.WhatsAppNumber" class="form-control" placeholder="+1 (555) 123-4567" />
+                                <small class="form-text text-muted">Include country code (e.g., +1 for US)</small>
+                                <span asp-validation-for="SocialMedia.WhatsAppNumber" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="SocialMedia.TwitterHandle" class="form-label">
+                                    <i class="fab fa-twitter text-info me-2"></i>Twitter Handle
+                                </label>
+                                <input asp-for="SocialMedia.TwitterHandle" class="form-control" placeholder="@@yourhandle" />
+                                <span asp-validation-for="SocialMedia.TwitterHandle" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Social Media Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Email Settings Tab -->
+    <div class="tab-pane fade" id="email-settings" role="tabpanel">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-envelope me-2"></i>Email Configuration
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Note:</strong> These settings are used for sending system emails like contact form notifications and donation receipts.
+                </div>
+
+                <form asp-action="UpdateEmailSettings" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group mb-3">
+                                <label asp-for="EmailSettings.SmtpServer" class="form-label">SMTP Server</label>
+                                <input asp-for="EmailSettings.SmtpServer" class="form-control" placeholder="smtp.gmail.com" />
+                                <span asp-validation-for="EmailSettings.SmtpServer" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group mb-3">
+                                <label asp-for="EmailSettings.SmtpPort" class="form-label">SMTP Port</label>
+                                <input asp-for="EmailSettings.SmtpPort" type="number" class="form-control" placeholder="587" />
+                                <span asp-validation-for="EmailSettings.SmtpPort" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="EmailSettings.FromEmail" class="form-label">From Email Address</label>
+                                <input asp-for="EmailSettings.FromEmail" type="email" class="form-control" placeholder="noreply@example.com" />
+                                <span asp-validation-for="EmailSettings.FromEmail" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="EmailSettings.FromName" class="form-label">From Name</label>
+                                <input asp-for="EmailSettings.FromName" class="form-control" placeholder="Your Community Name" />
+                                <span asp-validation-for="EmailSettings.FromName" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input asp-for="EmailSettings.UseSSL" class="form-check-input" type="checkbox" />
+                        <label asp-for="EmailSettings.UseSSL" class="form-check-label">
+                            Use SSL/TLS encryption
+                        </label>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="EmailSettings.Username" class="form-label">SMTP Username</label>
+                                <input asp-for="EmailSettings.Username" class="form-control" placeholder="username" autocomplete="username" />
+                                <span asp-validation-for="EmailSettings.Username" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="EmailSettings.Password" class="form-label">SMTP Password</label>
+                                <input asp-for="EmailSettings.Password" type="password" class="form-control" placeholder="password" autocomplete="current-password" />
+                                <small class="form-text text-muted">Leave blank to keep current password</small>
+                                <span asp-validation-for="EmailSettings.Password" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>Save Email Settings
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary ms-2" onclick="testEmailSettings()">
+                        <i class="fas fa-paper-plane me-2"></i>Test Email Configuration
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- PayPal Settings Tab -->
+    <div class="tab-pane fade" id="paypal-settings" role="tabpanel">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fab fa-paypal me-2"></i>PayPal Configuration
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <strong>Important:</strong> PayPal settings are configured in the application settings file. Contact your developer to update PayPal credentials.
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card border-left-primary">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <i class="fas fa-cogs fa-2x text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">Current Mode</h6>
+                                        <p class="mb-0 text-muted">Sandbox (Test Mode)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card border-left-success">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center">
+                                    <div class="me-3">
+                                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="mb-1">Status</h6>
+                                        <p class="mb-0 text-muted">Configured & Active</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <h6>PayPal Setup Instructions</h6>
+                    <ol class="list-styled">
+                        <li>Create a PayPal Developer account at <a href="https://developer.paypal.com" target="_blank">developer.paypal.com</a></li>
+                        <li>Create a new app to get your Client ID and Client Secret</li>
+                        <li>Update the PayPal settings in your application configuration file</li>
+                        <li>For production, change the mode from "sandbox" to "live"</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function testEmailSettings() {
+        // Placeholder for email testing functionality
+        alert('Email test functionality would be implemented here. This would send a test email to verify the SMTP settings.');
+    }
+</script>

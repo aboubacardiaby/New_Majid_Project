@@ -1,0 +1,214 @@
+@model MasjidProject
+@{
+    ViewData["Title"] = "Create New Project";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-plus me-2"></i>
+                    Create New Masjid Project
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="CreateProject" method="post">
+                    @Html.AntiForgeryToken()
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Title" class="form-label">Project Title</label>
+                                <input asp-for="Title" class="form-control" placeholder="Enter project title" />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Status" class="form-label">Project Status</label>
+                                <select asp-for="Status" class="form-select">
+                                    <option value="Planning">Planning</option>
+                                    <option value="Fundraising" selected>Fundraising</option>
+                                    <option value="Construction">Construction</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Project Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe the project in detail..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="TargetAmount" class="form-label">Target Amount ($)</label>
+                                <input asp-for="TargetAmount" class="form-control" type="number" step="0.01" min="1" placeholder="0.00" />
+                                <span asp-validation-for="TargetAmount" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="CurrentAmount" class="form-label">Current Amount ($)</label>
+                                <input asp-for="CurrentAmount" class="form-control" type="number" step="0.01" min="0" placeholder="0.00" />
+                                <span asp-validation-for="CurrentAmount" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="StartDate" class="form-label">Start Date</label>
+                                <input asp-for="StartDate" class="form-control" type="date" />
+                                <span asp-validation-for="StartDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="TargetCompletionDate" class="form-label">Target Completion Date (Optional)</label>
+                                <input asp-for="TargetCompletionDate" class="form-control" type="date" />
+                                <span asp-validation-for="TargetCompletionDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Location" class="form-label">Project Location (Optional)</label>
+                        <input asp-for="Location" class="form-control" placeholder="Enter project location" />
+                        <span asp-validation-for="Location" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ImageUrl" class="form-label">Project Image URL (Optional)</label>
+                        <input asp-for="ImageUrl" class="form-control" type="url" placeholder="https://example.com/image.jpg" />
+                        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        <div class="form-text">Enter a URL for the project image that will be displayed to visitors.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Updates" class="form-label">Project Updates (Optional)</label>
+                        <textarea asp-for="Updates" class="form-control" rows="3" placeholder="Any updates or news about the project..."></textarea>
+                        <span asp-validation-for="Updates" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input asp-for="IsFeatured" class="form-check-input" type="checkbox" />
+                                    <label asp-for="IsFeatured" class="form-check-label">
+                                        Featured Project
+                                    </label>
+                                    <div class="form-text">Featured projects are highlighted on the homepage. Only one project can be featured at a time.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" checked />
+                                    <label asp-for="IsActive" class="form-check-label">
+                                        Active Project
+                                    </label>
+                                    <div class="form-text">Active projects are visible to visitors and accept donations.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-save me-1"></i>
+                            Create Project
+                        </button>
+                        <a href="@Url.Action("Projects")" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Project Guidelines
+                </h6>
+            </div>
+            <div class="card-body">
+                <h6 class="text-primary">Project Status Options:</h6>
+                <ul class="list-unstyled">
+                    <li><span class="badge bg-secondary me-2">Planning</span> Project is being planned</li>
+                    <li><span class="badge bg-info me-2">Fundraising</span> Actively seeking donations</li>
+                    <li><span class="badge bg-warning me-2">Construction</span> Work in progress</li>
+                    <li><span class="badge bg-success me-2">Completed</span> Project finished</li>
+                </ul>
+                
+                <hr>
+                
+                <h6 class="text-primary">Tips:</h6>
+                <ul class="small">
+                    <li>Write a clear, compelling description that explains the project's importance to the community.</li>
+                    <li>Set realistic target amounts and completion dates.</li>
+                    <li>Use high-quality images to showcase the project.</li>
+                    <li>Keep project updates current to maintain donor interest.</li>
+                    <li>Only mark one project as "Featured" at a time.</li>
+                </ul>
+                
+                <hr>
+                
+                <h6 class="text-primary">Image Guidelines:</h6>
+                <ul class="small">
+                    <li>Use images that are at least 800x600 pixels</li>
+                    <li>Ensure images are appropriate and represent the project</li>
+                    <li>Consider using architectural renderings for building projects</li>
+                    <li>Keep file sizes reasonable for fast loading</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Set default start date to today
+            const today = new Date().toISOString().split('T')[0];
+            if (!$('#StartDate').val()) {
+                $('#StartDate').val(today);
+            }
+            
+            // Preview image when URL is entered
+            $('#ImageUrl').on('blur', function() {
+                const imageUrl = $(this).val();
+                if (imageUrl) {
+                    // Remove existing preview
+                    $('#imagePreview').remove();
+                    
+                    // Add new preview
+                    const preview = `
+                        <div id="imagePreview" class="mt-2">
+                            <img src="${imageUrl}" alt="Preview" class="img-thumbnail" style="max-width: 200px;" 
+                                 onerror="this.style.display='none'; $('#imageError').show();" />
+                            <div id="imageError" style="display:none;" class="text-danger small">
+                                <i class="fas fa-exclamation-triangle"></i> Could not load image
+                            </div>
+                        </div>
+                    `;
+                    $(this).parent().append(preview);
+                }
+            });
+        });
+    </script>
+}

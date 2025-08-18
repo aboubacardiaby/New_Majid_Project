@@ -1,0 +1,152 @@
+@model ContactMessage
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-user me-2"></i>Contact Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Name:</strong></div>
+                    <div class="col-sm-9">@Model.Name</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Email:</strong></div>
+                    <div class="col-sm-9">
+                        <a href="mailto:@Model.Email">@Model.Email</a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Date:</strong></div>
+                    <div class="col-sm-9">@Model.DateSent.ToString("MMMM dd, yyyy 'at' h:mm tt")</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Status:</strong></div>
+                    <div class="col-sm-9">
+                        @if (Model.IsRead)
+                        {
+                            <span class="badge bg-success">
+                                <i class="fas fa-check me-1"></i>Read
+                            </span>
+                            @if (Model.ReadDate.HasValue)
+                            {
+                                <div class="small text-muted mt-1">
+                                    Read on @Model.ReadDate.Value.ToString("MMM dd, yyyy 'at' h:mm tt")
+                                    @if (!string.IsNullOrEmpty(Model.ReadBy))
+                                    {
+                                        <span> by @Model.ReadBy</span>
+                                    }
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <span class="badge bg-warning">
+                                <i class="fas fa-envelope me-1"></i>Unread
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-envelope me-2"></i>Message Details
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Subject:</strong></div>
+                    <div class="col-sm-9">
+                        @if (string.IsNullOrEmpty(Model.Subject))
+                        {
+                            <em class="text-muted">(No Subject)</em>
+                        }
+                        else
+                        {
+                            @Model.Subject
+                        }
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-3"><strong>Length:</strong></div>
+                    <div class="col-sm-9">@Model.Message.Length characters</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-comment me-2"></i>Message Content
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="bg-light p-4 rounded border">
+                    <div style="white-space: pre-wrap; font-family: inherit; line-height: 1.6;">@Model.Message</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-tools me-2"></i>Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="btn btn-primary" onclick="replyToMessage(@Model.Id)">
+                        <i class="fas fa-reply me-2"></i>Reply to @Model.Name
+                    </button>
+                    
+                    @if (!Model.IsRead)
+                    {
+                        <button type="button" class="btn btn-success" onclick="markAsRead(@Model.Id)">
+                            <i class="fas fa-check me-2"></i>Mark as Read
+                        </button>
+                    }
+                    
+                    <button type="button" class="btn btn-info" onclick="copyToClipboard('@Model.Email')">
+                        <i class="fas fa-copy me-2"></i>Copy Email
+                    </button>
+                    
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.open('mailto:@Model.Email?subject=Re: @(Model.Subject ?? "Your Message")&body=Dear @Model.Name,%0A%0AThank you for contacting the Gambian Muslim Community.%0A%0A')">
+                        <i class="fas fa-external-link-alt me-2"></i>Open in Email Client
+                    </button>
+                    
+                    <button type="button" class="btn btn-outline-danger" onclick="deleteMessage(@Model.Id)">
+                        <i class="fas fa-trash me-2"></i>Delete Message
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            AdminPanel.showNotification('Success', 'Email address copied to clipboard', 'success');
+        }, function(err) {
+            console.error('Could not copy text: ', err);
+            AdminPanel.showNotification('Error', 'Failed to copy email address', 'error');
+        });
+    }
+</script>

@@ -1,0 +1,803 @@
+@model AdminMessageManagementViewModel
+@{
+    ViewData["Title"] = "Message Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-2 text-gray-800">
+            <i class="fas fa-envelope me-2"></i>Message Management
+        </h1>
+        <p class="mb-4">Manage community messages and send mass communications.</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card primary">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-envelope fa-2x text-primary"></i>
+                </div>
+                <div>
+                    <div class="stats-value">@Model.TotalCount</div>
+                    <div class="stats-label">Total Messages</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card warning">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-envelope-open fa-2x text-warning"></i>
+                </div>
+                <div>
+                    <div class="stats-value">@Model.UnreadCount</div>
+                    <div class="stats-label">Unread Messages</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card success">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-check-circle fa-2x text-success"></i>
+                </div>
+                <div>
+                    <div class="stats-value">@(Model.TotalCount - Model.UnreadCount)</div>
+                    <div class="stats-label">Read Messages</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card info">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-calendar fa-2x text-info"></i>
+                </div>
+                <div>
+                    <div class="stats-value">@Model.Messages.Where(m => m.DateSent >= DateTime.Today.AddDays(-7)).Count()</div>
+                    <div class="stats-label">This Week</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Action Buttons -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#massMessageModal">
+                <i class="fas fa-bullhorn me-2"></i>Send Mass Message
+            </button>
+            <button type="button" class="btn btn-success" onclick="markAllAsRead()">
+                <i class="fas fa-check-double me-2"></i>Mark All as Read
+            </button>
+            <button type="button" class="btn btn-info" onclick="exportMessages()">
+                <i class="fas fa-file-excel me-2"></i>Export Messages
+            </button>
+            <button type="button" class="btn btn-outline-secondary" onclick="refreshMessages()">
+                <i class="fas fa-sync me-2"></i>Refresh
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-filter me-2"></i>Filters and Search
+        </h6>
+    </div>
+    <div class="card-body">
+        <form method="get" asp-action="Messages">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label for="SearchTerm" class="form-label">Search</label>
+                        <input asp-for="FilterOptions.SearchTerm" class="form-control" placeholder="Search name, email, or message content" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group mb-3">
+                        <label for="IsRead" class="form-label">Status</label>
+                        <select asp-for="FilterOptions.IsRead" class="form-control">
+                            <option value="">All Messages</option>
+                            <option value="false">Unread Only</option>
+                            <option value="true">Read Only</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group mb-3">
+                        <label for="StartDate" class="form-label">From Date</label>
+                        <input asp-for="FilterOptions.StartDate" type="date" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group mb-3">
+                        <label for="EndDate" class="form-label">To Date</label>
+                        <input asp-for="FilterOptions.EndDate" type="date" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group mb-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                            <a href="@Url.Action("Messages")" class="btn btn-outline-secondary">
+                                <i class="fas fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Messages Table -->
+<div class="card">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-list me-2"></i>Messages List
+            <span class="badge bg-primary ms-2">@Model.TotalCount Total</span>
+            @if (Model.UnreadCount > 0)
+            {
+                <span class="badge bg-warning ms-2">@Model.UnreadCount Unread</span>
+            }
+        </h6>
+    </div>
+    <div class="card-body">
+        @if (Model.Messages.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover admin-table" id="messagesTable">
+                    <thead>
+                        <tr>
+                            <th width="30">
+                                <input type="checkbox" id="selectAll" onchange="toggleAllMessages()" />
+                            </th>
+                            <th>Date</th>
+                            <th>From</th>
+                            <th>Subject</th>
+                            <th>Message Preview</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var message in Model.Messages)
+                        {
+                            <tr class="@(!message.IsRead ? "table-warning" : "")" data-message-id="@message.Id">
+                                <td>
+                                    <input type="checkbox" class="message-checkbox" value="@message.Id" />
+                                </td>
+                                <td>
+                                    <div class="fw-bold">@message.DateSent.ToString("MMM dd")</div>
+                                    <small class="text-muted">@message.DateSent.ToString("h:mm tt")</small>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <div class="fw-bold">@message.Name</div>
+                                            <small class="text-muted">@message.Email</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold">
+                                        @if (!message.IsRead)
+                                        {
+                                            <i class="fas fa-circle text-warning me-1" style="font-size: 8px;"></i>
+                                        }
+                                        @(string.IsNullOrEmpty(message.Subject) ? "(No Subject)" : message.Subject)
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="message-preview">
+                                        @(message.Message.Length > 100 ? message.Message.Substring(0, 100) + "..." : message.Message)
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (message.IsRead)
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check me-1"></i>Read
+                                        </span>
+                                        @if (message.ReadDate.HasValue)
+                                        {
+                                            <small class="d-block text-muted">@message.ReadDate.Value.ToString("MMM dd, h:mm tt")</small>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-envelope me-1"></i>Unread
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewMessage(@message.Id)" title="View Message">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-success" onclick="replyToMessage(@message.Id)" title="Reply">
+                                            <i class="fas fa-reply"></i>
+                                        </button>
+                                        @if (!message.IsRead)
+                                        {
+                                            <button type="button" class="btn btn-sm btn-outline-info" onclick="markAsRead(@message.Id)" title="Mark as Read">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        }
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteMessage(@message.Id)" title="Delete">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Bulk Actions -->
+            <div class="row mt-3">
+                <div class="col-md-6">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="text-muted">With selected:</span>
+                        <button type="button" class="btn btn-sm btn-outline-success" onclick="markSelectedAsRead()">
+                            <i class="fas fa-check me-1"></i>Mark as Read
+                        </button>
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteSelected()">
+                            <i class="fas fa-trash me-1"></i>Delete
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <span class="text-muted float-end">
+                        Showing @Model.Messages.Count() of @Model.TotalCount messages
+                    </span>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Messages pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Messages", new { page = Model.PageNumber - 1, FilterOptions = Model.FilterOptions })">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </a>
+                        </li>
+                        
+                        @for (int i = Math.Max(1, Model.PageNumber - 2); i <= Math.Min(Model.TotalPages, Model.PageNumber + 2); i++)
+                        {
+                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Messages", new { page = i, FilterOptions = Model.FilterOptions })">@i</a>
+                            </li>
+                        }
+                        
+                        <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Messages", new { page = Model.PageNumber + 1, FilterOptions = Model.FilterOptions })">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-envelope fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Messages Found</h4>
+                <p class="text-muted">
+                    @if (Model.FilterOptions.SearchTerm != null || Model.FilterOptions.StartDate != null || Model.FilterOptions.EndDate != null)
+                    {
+                        <span>No messages match your current filters. Try adjusting your search criteria.</span>
+                    }
+                    else
+                    {
+                        <span>No messages have been received yet. Messages will appear here when submitted through the contact form.</span>
+                    }
+                </p>
+                @if (Model.FilterOptions.SearchTerm != null || Model.FilterOptions.StartDate != null || Model.FilterOptions.EndDate != null)
+                {
+                    <a href="@Url.Action("Messages")" class="btn btn-outline-primary">
+                        <i class="fas fa-times me-2"></i>Clear Filters
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Message View Modal -->
+<div class="modal fade" id="messageViewModal" tabindex="-1" aria-labelledby="messageViewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="messageViewModalLabel">
+                    <i class="fas fa-envelope me-2"></i>Message Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="messageViewContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="replyFromModal()">
+                    <i class="fas fa-reply me-2"></i>Reply
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Reply Modal -->
+<div class="modal fade" id="replyModal" tabindex="-1" aria-labelledby="replyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="replyModalLabel">
+                    <i class="fas fa-reply me-2"></i>Reply to Message
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="replyForm">
+                <div class="modal-body">
+                    <input type="hidden" id="replyMessageId" />
+                    <div class="mb-3">
+                        <label for="replyTo" class="form-label">To:</label>
+                        <input type="email" class="form-control" id="replyTo" readonly />
+                    </div>
+                    <div class="mb-3">
+                        <label for="replySubject" class="form-label">Subject:</label>
+                        <input type="text" class="form-control" id="replySubject" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="replyMessage" class="form-label">Message:</label>
+                        <textarea class="form-control" id="replyMessage" rows="8" required placeholder="Type your reply here..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="sendCopy" value="true" />
+                            <label class="form-check-label" for="sendCopy">
+                                Send a copy to myself
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-2"></i>Send Reply
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Mass Message Modal -->
+<div class="modal fade" id="massMessageModal" tabindex="-1" aria-labelledby="massMessageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="massMessageModalLabel">
+                    <i class="fas fa-bullhorn me-2"></i>Send Mass Message to Community
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="massMessageForm">
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Note:</strong> This message will be sent to all community members who have provided their email addresses through donations or contact forms.
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="massSubject" class="form-label">Subject: *</label>
+                        <input type="text" class="form-control" id="massSubject" required placeholder="Enter email subject" />
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="massMessage" class="form-label">Message: *</label>
+                        <textarea class="form-control" id="massMessage" rows="10" required placeholder="Type your message to the community..."></textarea>
+                        <div class="form-text">You can use HTML formatting for rich text.</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Recipients:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="recipientType" id="allMembers" value="all" checked />
+                            <label class="form-check-label" for="allMembers">
+                                All community members (donors + contacts)
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="recipientType" id="donorsOnly" value="donors" />
+                            <label class="form-check-label" for="donorsOnly">
+                                Donors only
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="recipientType" id="contactsOnly" value="contacts" />
+                            <label class="form-check-label" for="contactsOnly">
+                                Contact form users only
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="testMode" value="true" />
+                            <label class="form-check-label" for="testMode">
+                                Test mode (send only to yourself first)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div id="recipientCount" class="small text-muted">
+                        <!-- Will be populated via JavaScript -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-paper-plane me-2"></i>Send Message
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentMessageId = null;
+
+        // View message details
+        function viewMessage(messageId) {
+            fetch(`/Admin/GetMessageDetails/${messageId}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('messageViewContent').innerHTML = html;
+                    currentMessageId = messageId;
+                    new bootstrap.Modal(document.getElementById('messageViewModal')).show();
+                })
+                .catch(error => {
+                    console.error('Error loading message details:', error);
+                    AdminPanel.showNotification('Error', 'Failed to load message details', 'error');
+                });
+        }
+
+        // Reply to message
+        function replyToMessage(messageId) {
+            fetch(`/Admin/GetMessageForReply/${messageId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('replyMessageId').value = messageId;
+                        document.getElementById('replyTo').value = data.email;
+                        document.getElementById('replySubject').value = `Re: ${data.subject || '(No Subject)'}`;
+                        document.getElementById('replyMessage').value = `\n\n--- Original Message ---\nFrom: ${data.name} <${data.email}>\nDate: ${data.date}\nSubject: ${data.subject || '(No Subject)'}\n\n${data.message}`;
+                        new bootstrap.Modal(document.getElementById('replyModal')).show();
+                    } else {
+                        AdminPanel.showNotification('Error', 'Failed to load message for reply', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading message for reply:', error);
+                    AdminPanel.showNotification('Error', 'Failed to load message for reply', 'error');
+                });
+        }
+
+        // Reply from modal
+        function replyFromModal() {
+            if (currentMessageId) {
+                document.getElementById('messageViewModal').querySelector('.btn-close').click();
+                setTimeout(() => replyToMessage(currentMessageId), 300);
+            }
+        }
+
+        // Mark message as read
+        function markAsRead(messageId) {
+            fetch(`/Admin/MarkMessageRead/${messageId}`, {
+                method: 'POST',
+                headers: {
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const row = document.querySelector(`tr[data-message-id="${messageId}"]`);
+                    if (row) {
+                        row.classList.remove('table-warning');
+                        // Update status badge
+                        const statusCell = row.cells[5];
+                        statusCell.innerHTML = '<span class="badge bg-success"><i class="fas fa-check me-1"></i>Read</span>';
+                        // Remove unread indicator
+                        const subjectCell = row.cells[3];
+                        const indicator = subjectCell.querySelector('.fas.fa-circle');
+                        if (indicator) indicator.remove();
+                    }
+                    AdminPanel.showNotification('Success', 'Message marked as read', 'success');
+                } else {
+                    AdminPanel.showNotification('Error', data.message || 'Failed to mark message as read', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error marking message as read:', error);
+                AdminPanel.showNotification('Error', 'Failed to mark message as read', 'error');
+            });
+        }
+
+        // Delete message
+        function deleteMessage(messageId) {
+            if (confirm('Are you sure you want to delete this message? This action cannot be undone.')) {
+                fetch(`/Admin/DeleteMessage/${messageId}`, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const row = document.querySelector(`tr[data-message-id="${messageId}"]`);
+                        if (row) {
+                            row.style.transition = 'opacity 0.3s';
+                            row.style.opacity = '0';
+                            setTimeout(() => row.remove(), 300);
+                        }
+                        AdminPanel.showNotification('Success', 'Message deleted successfully', 'success');
+                    } else {
+                        AdminPanel.showNotification('Error', data.message || 'Failed to delete message', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting message:', error);
+                    AdminPanel.showNotification('Error', 'Failed to delete message', 'error');
+                });
+            }
+        }
+
+        // Toggle all messages
+        function toggleAllMessages() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.message-checkbox');
+            checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        }
+
+        // Mark selected as read
+        function markSelectedAsRead() {
+            const selected = getSelectedMessages();
+            if (selected.length === 0) {
+                AdminPanel.showNotification('Warning', 'Please select at least one message', 'warning');
+                return;
+            }
+
+            if (confirm(`Mark ${selected.length} selected message(s) as read?`)) {
+                fetch('/Admin/MarkMessagesAsRead', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({ messageIds: selected })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        AdminPanel.showNotification('Success', `${selected.length} message(s) marked as read`, 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        AdminPanel.showNotification('Error', data.message || 'Failed to mark messages as read', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error marking messages as read:', error);
+                    AdminPanel.showNotification('Error', 'Failed to mark messages as read', 'error');
+                });
+            }
+        }
+
+        // Delete selected messages
+        function deleteSelected() {
+            const selected = getSelectedMessages();
+            if (selected.length === 0) {
+                AdminPanel.showNotification('Warning', 'Please select at least one message', 'warning');
+                return;
+            }
+
+            if (confirm(`Are you sure you want to delete ${selected.length} selected message(s)? This action cannot be undone.`)) {
+                fetch('/Admin/DeleteMessages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({ messageIds: selected })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        AdminPanel.showNotification('Success', `${selected.length} message(s) deleted successfully`, 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        AdminPanel.showNotification('Error', data.message || 'Failed to delete messages', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting messages:', error);
+                    AdminPanel.showNotification('Error', 'Failed to delete messages', 'error');
+                });
+            }
+        }
+
+        // Get selected message IDs
+        function getSelectedMessages() {
+            const checkboxes = document.querySelectorAll('.message-checkbox:checked');
+            return Array.from(checkboxes).map(cb => parseInt(cb.value));
+        }
+
+        // Mark all as read
+        function markAllAsRead() {
+            if (confirm('Mark all messages as read?')) {
+                fetch('/Admin/MarkAllMessagesAsRead', {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        AdminPanel.showNotification('Success', 'All messages marked as read', 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        AdminPanel.showNotification('Error', data.message || 'Failed to mark all messages as read', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error marking all messages as read:', error);
+                    AdminPanel.showNotification('Error', 'Failed to mark all messages as read', 'error');
+                });
+            }
+        }
+
+        // Export messages
+        function exportMessages() {
+            const currentParams = new URLSearchParams(window.location.search);
+            currentParams.set('export', 'excel');
+            window.location.href = `/Admin/ExportMessages?${currentParams.toString()}`;
+        }
+
+        // Refresh messages
+        function refreshMessages() {
+            location.reload();
+        }
+
+        // Reply form submission
+        document.getElementById('replyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const messageId = document.getElementById('replyMessageId').value;
+            const replyData = {
+                messageId: messageId,
+                subject: document.getElementById('replySubject').value,
+                message: document.getElementById('replyMessage').value,
+                sendCopy: document.getElementById('sendCopy').checked
+            };
+
+            fetch('/Admin/ReplyToMessage', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: JSON.stringify(replyData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    AdminPanel.showNotification('Success', 'Reply sent successfully', 'success');
+                    document.getElementById('replyModal').querySelector('.btn-close').click();
+                    document.getElementById('replyForm').reset();
+                } else {
+                    AdminPanel.showNotification('Error', data.message || 'Failed to send reply', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending reply:', error);
+                AdminPanel.showNotification('Error', 'Failed to send reply', 'error');
+            });
+        });
+
+        // Mass message form submission
+        document.getElementById('massMessageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                subject: document.getElementById('massSubject').value,
+                message: document.getElementById('massMessage').value,
+                recipientType: document.querySelector('input[name="recipientType"]:checked').value,
+                testMode: document.getElementById('testMode').checked
+            };
+
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+            submitBtn.disabled = true;
+
+            fetch('/Admin/SendMassMessage', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    AdminPanel.showNotification('Success', data.message || 'Mass message sent successfully', 'success');
+                    document.getElementById('massMessageModal').querySelector('.btn-close').click();
+                    document.getElementById('massMessageForm').reset();
+                } else {
+                    AdminPanel.showNotification('Error', data.message || 'Failed to send mass message', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending mass message:', error);
+                AdminPanel.showNotification('Error', 'Failed to send mass message', 'error');
+            })
+            .finally(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            });
+        });
+
+        // Load recipient count
+        function updateRecipientCount() {
+            const recipientType = document.querySelector('input[name="recipientType"]:checked')?.value || 'all';
+            fetch(`/Admin/GetRecipientCount?type=${recipientType}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('recipientCount').innerHTML = 
+                            `<i class="fas fa-users me-1"></i>Approximately ${data.count} recipients will receive this message.`;
+                    }
+                })
+                .catch(error => console.error('Error loading recipient count:', error));
+        }
+
+        // Update recipient count when selection changes
+        document.querySelectorAll('input[name="recipientType"]').forEach(radio => {
+            radio.addEventListener('change', updateRecipientCount);
+        });
+
+        // Initialize recipient count
+        document.addEventListener('DOMContentLoaded', function() {
+            updateRecipientCount();
+        });
+    </script>
+}

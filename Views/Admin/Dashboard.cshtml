@@ -1,0 +1,546 @@
+@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-2 text-gray-800">
+            <i class="fas fa-tachometer-alt me-2"></i>Dashboard Overview
+        </h1>
+        <p class="mb-4">Welcome back! Here's what's happening with your community.</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card primary">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="stats-value">$@Model.Stats.TotalDonations.ToString("N0")</div>
+                    <div class="stats-label">Total Donations</div>
+                </div>
+                <div class="text-primary">
+                    <i class="fas fa-donate fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card success">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="stats-value">@Model.Stats.TotalDonators</div>
+                    <div class="stats-label">Total Donors</div>
+                </div>
+                <div class="text-success">
+                    <i class="fas fa-users fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card warning">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="stats-value">@Model.Stats.PendingMessages</div>
+                    <div class="stats-label">Pending Messages</div>
+                </div>
+                <div class="text-warning">
+                    <i class="fas fa-envelope fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card info">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <div class="stats-value">@Model.Stats.ActiveProjects</div>
+                    <div class="stats-label">Active Projects</div>
+                </div>
+                <div class="text-info">
+                    <i class="fas fa-building fa-2x"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Monthly Overview -->
+<div class="row mb-4">
+    <div class="col-xl-8 col-lg-7">
+        <div class="card">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-chart-area me-2"></i>Monthly Overview
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="text-center">
+                            <div class="h4 mb-0 font-weight-bold text-success">$@Model.Stats.MonthlyDonations.ToString("N0")</div>
+                            <div class="text-muted">This Month's Donations</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-center">
+                            <div class="h4 mb-0 font-weight-bold text-info">@Model.Stats.WeeklyDonations</div>
+                            <div class="text-muted">This Week's Donations</div>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="text-center">
+                    <div class="h5 mb-0 font-weight-bold text-primary">$@Model.Stats.AverageDonation.ToString("N2")</div>
+                    <div class="text-muted">Average Donation Amount</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-xl-4 col-lg-5">
+        <div class="card">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-building me-2"></i>Active Projects
+                </h6>
+            </div>
+            <div class="card-body">
+                @if (Model.ActiveProjects.Any())
+                {
+                    @foreach (var project in Model.ActiveProjects.Take(3))
+                    {
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h6 class="mb-1">@project.Title</h6>
+                                <small class="text-muted">@project.ProgressPercentage%</small>
+                            </div>
+                            <div class="progress" style="height: 6px;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: @project.ProgressPercentage%" aria-valuenow="@project.ProgressPercentage" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <small class="text-muted">$@project.CurrentAmount.ToString("N0") of $@project.TargetAmount.ToString("N0")</small>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted text-center">No active projects</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+<div class="row">
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-donate me-2"></i>Recent Donations
+                </h6>
+                <a asp-action="Donations" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentDonations.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-borderless">
+                            <thead>
+                                <tr>
+                                    <th>Donor</th>
+                                    <th>Amount</th>
+                                    <th>Project</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var donation in Model.RecentDonations)
+                                {
+                                    <tr>
+                                        <td>@donation.DonorName</td>
+                                        <td class="font-weight-bold text-success">$@donation.Amount.ToString("N0")</td>
+                                        <td>
+                                            <small class="text-muted">@donation.ProjectName</small>
+                                        </td>
+                                        <td>
+                                            @if (donation.PaymentStatus == "Completed")
+                                            {
+                                                <span class="badge bg-success">Completed</span>
+                                            }
+                                            else if (donation.PaymentStatus == "Pending")
+                                            {
+                                                <span class="badge bg-warning">Pending</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">@donation.PaymentStatus</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted text-center">No recent donations</p>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-6 mb-4">
+        <div class="card">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-envelope me-2"></i>Recent Messages
+                </h6>
+                <a asp-action="Messages" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body">
+                @if (Model.RecentMessages.Any())
+                {
+                    @foreach (var message in Model.RecentMessages)
+                    {
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="me-3">
+                                @if (message.IsRead)
+                                {
+                                    <i class="fas fa-envelope-open text-muted"></i>
+                                }
+                                else
+                                {
+                                    <i class="fas fa-envelope text-primary"></i>
+                                }
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between">
+                                    <h6 class="mb-1">@message.Name</h6>
+                                    <small class="text-muted">@message.DateSent.ToString("MMM dd")</small>
+                                </div>
+                                <p class="mb-0 text-muted small">@message.Subject</p>
+                                @if (!string.IsNullOrEmpty(message.Message))
+                                {
+                                    <p class="mb-0 text-muted small">@(message.Message.Length > 80 ? message.Message.Substring(0, 80) + "..." : message.Message)</p>
+                                }
+                            </div>
+                        </div>
+                        @if (message != Model.RecentMessages.Last())
+                        {
+                            <hr>
+                        }
+                    }
+                }
+                else
+                {
+                    <p class="text-muted text-center">No recent messages</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Admin Activities -->
+@if (Model.RecentActivities.Any())
+{
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-history me-2"></i>Recent Admin Activities
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="timeline">
+                        @foreach (var activity in Model.RecentActivities.Take(10))
+                        {
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="me-3">
+                                    @switch (activity.Action.ToLower())
+                                    {
+                                        case "login":
+                                            <i class="fas fa-sign-in-alt text-success"></i>
+                                            break;
+                                        case "logout":
+                                            <i class="fas fa-sign-out-alt text-muted"></i>
+                                            break;
+                                        case "create":
+                                        case "create project":
+                                            <i class="fas fa-plus text-success"></i>
+                                            break;
+                                        case "update":
+                                        case "update project":
+                                        case "update settings":
+                                            <i class="fas fa-edit text-primary"></i>
+                                            break;
+                                        case "delete":
+                                        case "delete project":
+                                        case "delete message":
+                                            <i class="fas fa-trash text-danger"></i>
+                                            break;
+                                        default:
+                                            <i class="fas fa-info-circle text-info"></i>
+                                            break;
+                                    }
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <strong>@activity.AdminUser.FullName</strong> @activity.Action.ToLower()
+                                            @if (!string.IsNullOrEmpty(activity.Entity))
+                                            {
+                                                <span class="text-muted">@activity.Entity.ToLower()</span>
+                                            }
+                                        </div>
+                                        <small class="text-muted">@activity.ActivityDate.ToString("MMM dd, HH:mm")</small>
+                                    </div>
+                                    @if (!string.IsNullOrEmpty(activity.Description))
+                                    {
+                                        <small class="text-muted">@activity.Description</small>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    .timeline {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .timeline::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .timeline::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+    
+    .timeline::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 10px;
+    }
+    
+    .timeline::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+    
+    /* Enhanced dashboard styles */
+    .stats-card {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        box-shadow: 0 0.25rem 2rem 0 rgba(58, 59, 69, 0.15);
+        transition: all 0.3s ease;
+        border-left: 4px solid #e74a3b;
+        margin-bottom: 20px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stats-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+    
+    .stats-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 3rem 0 rgba(58, 59, 69, 0.25);
+    }
+    
+    .stats-card.primary {
+        border-left-color: #4e73df;
+        background: linear-gradient(135deg, #fff 0%, #f8f9ff 100%);
+    }
+    
+    .stats-card.success {
+        border-left-color: #1cc88a;
+        background: linear-gradient(135deg, #fff 0%, #f0fff4 100%);
+    }
+    
+    .stats-card.warning {
+        border-left-color: #f6c23e;
+        background: linear-gradient(135deg, #fff 0%, #fffdf0 100%);
+    }
+    
+    .stats-card.info {
+        border-left-color: #36b9cc;
+        background: linear-gradient(135deg, #fff 0%, #f0fcff 100%);
+    }
+    
+    .stats-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #5a5c69;
+        margin-bottom: 5px;
+    }
+    
+    .stats-label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #858796;
+        letter-spacing: 0.5px;
+    }
+    
+    .card {
+        border: none;
+        box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        border-radius: 15px;
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #fff 0%, #f8f9fc 100%);
+        border-bottom: 1px solid #e3e6f0;
+        padding: 1.5rem;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .card-header h6 {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #5a5c69;
+        margin: 0;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    .progress {
+        height: 8px;
+        background-color: #f1f3f4;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .progress-bar {
+        background: linear-gradient(135deg, #1cc88a 0%, #17a673 100%);
+        border-radius: 10px;
+        transition: width 0.6s ease;
+    }
+    
+    .table-borderless th,
+    .table-borderless td {
+        border: none;
+        padding: 0.75rem 0;
+    }
+    
+    .table-borderless th {
+        font-weight: 600;
+        color: #5a5c69;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .badge {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 10px;
+    }
+    
+    .text-gray-800 {
+        color: #5a5c69 !important;
+    }
+    
+    .text-success {
+        color: #1cc88a !important;
+    }
+    
+    .text-primary {
+        color: #4e73df !important;
+    }
+    
+    .text-warning {
+        color: #f6c23e !important;
+    }
+    
+    .text-info {
+        color: #36b9cc !important;
+    }
+    
+    .h3 {
+        font-weight: 600;
+        color: #5a5c69;
+    }
+    
+    .btn-outline-primary {
+        color: #4e73df;
+        border-color: #4e73df;
+        border-radius: 10px;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-outline-primary:hover {
+        background-color: #4e73df;
+        border-color: #4e73df;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(78, 115, 223, 0.3);
+    }
+    
+    /* Animation for stats cards */
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .stats-card {
+        animation: fadeInUp 0.6s ease-out;
+    }
+    
+    .stats-card:nth-child(1) { animation-delay: 0.1s; }
+    .stats-card:nth-child(2) { animation-delay: 0.2s; }
+    .stats-card:nth-child(3) { animation-delay: 0.3s; }
+    .stats-card:nth-child(4) { animation-delay: 0.4s; }
+    
+    /* Responsive improvements */
+    @@media (max-width: 768px) {
+        .stats-value {
+            font-size: 2rem;
+        }
+        
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .card-header {
+            padding: 1rem;
+        }
+    }
+</style>

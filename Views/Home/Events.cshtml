@@ -1,0 +1,92 @@
+@model List<CommunityEvent>
+@{
+    ViewData["Title"] = "Events";
+}
+
+<section class="page-header">
+    <div class="container">
+        <h1>Community Events</h1>
+        <p>Join us for upcoming community gatherings and programs</p>
+    </div>
+</section>
+
+<section class="events-detailed">
+    <div class="container">
+        <div class="events-list">
+            @foreach (var eventItem in Model)
+            {
+                <div class="event-card-detailed">
+                    <div class="event-date-large">
+                        <span class="month">@eventItem.EventDate.ToString("MMM")</span>
+                        <span class="day">@eventItem.EventDate.Day</span>
+                        <span class="year">@eventItem.EventDate.Year</span>
+                    </div>
+                    <div class="event-content">
+                        <div class="event-header">
+                            <h3>@eventItem.Title</h3>
+                            <span class="event-type">@eventItem.EventType</span>
+                        </div>
+                        <p class="event-description">@eventItem.Description</p>
+                        <div class="event-details">
+                            <p><i class="fas fa-clock"></i> @(DateTime.Today.Add(eventItem.StartTime).ToString("h:mm tt")) - @(DateTime.Today.Add(eventItem.EndTime).ToString("h:mm tt"))</p>
+                            <p><i class="fas fa-map-marker-alt"></i> @eventItem.Location</p>
+                            <p><i class="fas fa-calendar"></i> @eventItem.EventDate.ToString("dddd, MMMM d, yyyy")</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="regular-programs">
+            <h2>Regular Programs</h2>
+            <div class="programs-grid">
+                <div class="program-card">
+                    <h4>Friday Prayers (Jummah)</h4>
+                    <p><i class="fas fa-clock"></i> Every Friday, 12:30 PM</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Main Prayer Hall</p>
+                    <p>Weekly congregational prayer with sermon</p>
+                </div>
+                <div class="program-card">
+                    <h4>Islamic School</h4>
+                    <p><i class="fas fa-clock"></i> Saturdays, 9:00 AM - 12:00 PM</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Education Center</p>
+                    <p>Quran and Islamic studies for children</p>
+                </div>
+                <div class="program-card">
+                    <h4>Adult Study Circle</h4>
+                    <p><i class="fas fa-clock"></i> Sundays, 2:00 PM - 4:00 PM</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Community Room</p>
+                    <p>Islamic studies and Quran discussion</p>
+                </div>
+                <div class="program-card">
+                    <h4>Youth Program</h4>
+                    <p><i class="fas fa-clock"></i> Saturdays, 1:00 PM - 3:00 PM</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Youth Center</p>
+                    <p>Activities and education for young Muslims</p>
+                </div>
+                <div class="program-card">
+                    <h4>Women's Circle</h4>
+                    <p><i class="fas fa-clock"></i> First Sunday of each month, 10:00 AM</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Women's Hall</p>
+                    <p>Support, education, and community building</p>
+                </div>
+                <div class="program-card">
+                    <h4>Community Iftar</h4>
+                    <p><i class="fas fa-clock"></i> During Ramadan, daily at sunset</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Main Hall</p>
+                    <p>Breaking fast together as a community</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="event-contact">
+            <h2>Want to Organize an Event?</h2>
+            <p>If you're interested in organizing a community event or have ideas for programs, we'd love to hear from you!</p>
+            <div class="contact-info">
+                <p><i class="fas fa-phone"></i> Call us at (612) 555-0123</p>
+                <p><i class="fas fa-envelope"></i> Email: events@gambianmuslimcommunity.org</p>
+                <a asp-action="Contact" class="btn btn-primary">Contact Us</a>
+            </div>
+        </div>
+    </div>
+</section>

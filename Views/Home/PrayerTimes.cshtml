@@ -1,0 +1,116 @@
+@model PrayerSchedule
+@{
+    ViewData["Title"] = "Prayer Times";
+}
+
+<section class="page-header">
+    <div class="container">
+        <h1>Prayer Times</h1>
+        <p>Daily prayer schedule for @Model.City</p>
+    </div>
+</section>
+
+<section class="prayer-times-detailed">
+    <div class="container">
+        <div class="current-date">
+            <h2><i class="fas fa-calendar-day"></i> @Model.Date.ToString("dddd, MMMM d, yyyy")</h2>
+        </div>
+
+        <div class="prayer-schedule-large">
+            @foreach (var prayer in Model.Prayers)
+            {
+                <div class="prayer-card-large @(prayer.IsNext ? "next-prayer" : "")">
+                    <div class="prayer-name">
+                        <h3>@prayer.Name</h3>
+                        @if (prayer.IsNext)
+                        {
+                            <span class="next-indicator">Next Prayer</span>
+                        }
+                    </div>
+                    <div class="prayer-time-large">
+                        @(DateTime.Today.Add(prayer.Time).ToString("h:mm tt"))
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="prayer-info">
+            <div class="info-grid">
+                <div class="info-section">
+                    <h3>Prayer Guidelines</h3>
+                    <ul>
+                        <li><i class="fas fa-check"></i> Arrive 10-15 minutes before prayer time</li>
+                        <li><i class="fas fa-check"></i> Perform ablution (Wudu) before entering</li>
+                        <li><i class="fas fa-check"></i> Dress modestly and appropriately</li>
+                        <li><i class="fas fa-check"></i> Turn off mobile devices</li>
+                        <li><i class="fas fa-check"></i> Follow the Imam during congregational prayers</li>
+                    </ul>
+                </div>
+
+                <div class="info-section">
+                    <h3>Special Prayers</h3>
+                    <ul>
+                        <li><i class="fas fa-star"></i> <strong>Jummah Prayer:</strong> Every Friday at 12:30 PM</li>
+                        <li><i class="fas fa-star"></i> <strong>Eid Prayers:</strong> Special times announced</li>
+                        <li><i class="fas fa-star"></i> <strong>Tarawih:</strong> During Ramadan after Isha</li>
+                        <li><i class="fas fa-star"></i> <strong>Tahajjud:</strong> Late night optional prayer</li>
+                        <li><i class="fas fa-star"></i> <strong>Janazah:</strong> Funeral prayers as needed</li>
+                    </ul>
+                </div>
+
+                <div class="info-section">
+                    <h3>Prayer Facilities</h3>
+                    <ul>
+                        <li><i class="fas fa-mosque"></i> Main Prayer Hall (Men)</li>
+                        <li><i class="fas fa-mosque"></i> Women's Prayer Area</li>
+                        <li><i class="fas fa-tint"></i> Ablution facilities available</li>
+                        <li><i class="fas fa-baby"></i> Mother's room with baby changing</li>
+                        <li><i class="fas fa-wheelchair"></i> Wheelchair accessible</li>
+                        <li><i class="fas fa-parking"></i> Free parking available</li>
+                    </ul>
+                </div>
+
+                <div class="info-section">
+                    <h3>Contact Information</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Community Center Drive<br>Minneapolis, MN 55404</p>
+                    <p><i class="fas fa-phone"></i> (612) 555-0123</p>
+                    <p><i class="fas fa-envelope"></i> prayers@gambianmuslimcommunity.org</p>
+                    <p class="note"><i class="fas fa-info-circle"></i> Prayer times may vary slightly. Please verify with the mosque for exact times, especially during seasonal changes.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="monthly-calendar">
+            <h3>Prayer Time Calculator</h3>
+            <p>Our prayer times are calculated based on the following methods:</p>
+            <ul>
+                <li><strong>Fajr:</strong> When the true dawn begins</li>
+                <li><strong>Sunrise:</strong> When the sun fully appears</li>
+                <li><strong>Dhuhr:</strong> When the sun reaches its highest point</li>
+                <li><strong>Asr:</strong> Mid-afternoon when shadows lengthen</li>
+                <li><strong>Maghrib:</strong> Just after sunset</li>
+                <li><strong>Isha:</strong> When twilight disappears</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        // Auto-refresh prayer times every minute
+        setInterval(function() {
+            location.reload();
+        }, 60000);
+
+        // Highlight current prayer
+        function updateCurrentPrayer() {
+            const now = new Date();
+            const currentTime = now.getHours() * 60 + now.getMinutes();
+            
+            // This would need to be enhanced with actual prayer time calculation
+            console.log('Current time check:', currentTime);
+        }
+
+        updateCurrentPrayer();
+    </script>
+}

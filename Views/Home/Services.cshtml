@@ -1,0 +1,94 @@
+@model List<Service>
+@{
+    ViewData["Title"] = "Services";
+}
+
+<section class="page-header">
+    <div class="container">
+        <h1>Our Services</h1>
+        <p>Comprehensive support for our community members</p>
+    </div>
+</section>
+
+<section class="services-detailed">
+    <div class="container">
+        <div class="services-grid">
+            @foreach (var service in Model)
+            {
+                <div class="service-card-detailed">
+                    <div class="service-header">
+                        <i class="@service.IconClass"></i>
+                        <h3>@service.Title</h3>
+                    </div>
+                    <div class="service-content">
+                        <p>@service.Description</p>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="service-details">
+            <h2>Additional Information</h2>
+            <div class="details-grid">
+                <div class="detail-section">
+                    <h3>Prayer Schedule</h3>
+                    <p>Our mosque is open for all five daily prayers. We also hold special congregational prayers for Jummah (Friday prayers) and during Islamic holidays like Eid ul-Fitr and Eid ul-Adha.</p>
+                    <ul>
+                        <li>Daily congregational prayers</li>
+                        <li>Jummah prayers every Friday</li>
+                        <li>Eid celebrations</li>
+                        <li>Tarawih prayers during Ramadan</li>
+                        <li>Special occasion prayers</li>
+                    </ul>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Educational Programs</h3>
+                    <p>We offer comprehensive Islamic education for all ages, from children's Quran classes to adult Islamic studies and Arabic language instruction.</p>
+                    <ul>
+                        <li>Weekend Islamic school</li>
+                        <li>Adult Quran study circles</li>
+                        <li>Arabic language classes</li>
+                        <li>Islamic history and jurisprudence</li>
+                        <li>Memorization programs (Hifz)</li>
+                    </ul>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Community Support Services</h3>
+                    <p>Our community provides various support services to help members navigate challenges and celebrate life's important moments.</p>
+                    <ul>
+                        <li>New immigrant assistance</li>
+                        <li>Marriage counseling</li>
+                        <li>Youth mentorship programs</li>
+                        <li>Emergency financial assistance</li>
+                        <li>Job placement support</li>
+                        <li>Translation services</li>
+                    </ul>
+                </div>
+
+                <div class="detail-section">
+                    <h3>Cultural Programs</h3>
+                    <p>We celebrate both Islamic holidays and Gambian cultural traditions, helping preserve our heritage while building community bonds.</p>
+                    <ul>
+                        <li>Eid celebrations and festivals</li>
+                        <li>Cultural heritage events</li>
+                        <li>Traditional music and arts</li>
+                        <li>Community iftar during Ramadan</li>
+                        <li>Interfaith dialogue programs</li>
+                        <li>Youth cultural education</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="service-contact">
+            <h2>Need More Information?</h2>
+            <p>If you have questions about any of our services or would like to get involved, please don't hesitate to reach out to us.</p>
+            <div class="contact-buttons">
+                <a asp-action="Contact" class="btn btn-primary">Contact Us</a>
+                <a asp-action="Events" class="btn btn-secondary">View Upcoming Events</a>
+            </div>
+        </div>
+    </div>
+</section>

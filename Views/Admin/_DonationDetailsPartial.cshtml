@@ -1,0 +1,228 @@
+@model MasjidDonation
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-user me-2"></i>Donor Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Name:</strong></div>
+                    <div class="col-sm-8">
+                        @if (Model.IsAnonymous)
+                        {
+                            <span class="text-muted">
+                                <i class="fas fa-user-secret me-1"></i>Anonymous Donor
+                            </span>
+                        }
+                        else
+                        {
+                            @Model.DonorName
+                        }
+                    </div>
+                </div>
+                @if (!Model.IsAnonymous && !string.IsNullOrEmpty(Model.Email))
+                {
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Email:</strong></div>
+                        <div class="col-sm-8">
+                            <a href="mailto:@Model.Email">@Model.Email</a>
+                        </div>
+                    </div>
+                }
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Anonymous:</strong></div>
+                    <div class="col-sm-8">
+                        @if (Model.IsAnonymous)
+                        {
+                            <span class="badge bg-secondary">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">No</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-donate me-2"></i>Donation Details
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Amount:</strong></div>
+                    <div class="col-sm-8">
+                        <span class="fw-bold text-success fs-4">@Model.Amount.ToString("C")</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Date:</strong></div>
+                    <div class="col-sm-8">@Model.DonationDate.ToString("MMMM dd, yyyy 'at' h:mm tt")</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Project:</strong></div>
+                    <div class="col-sm-8">
+                        <strong>@Model.MasjidProject.Title</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="m-0 font-weight-bold text-primary">
+                    <i class="fas fa-credit-card me-2"></i>Payment Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Method:</strong></div>
+                    <div class="col-sm-8">
+                        <span class="badge bg-info">@Model.PaymentMethod</span>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Status:</strong></div>
+                    <div class="col-sm-8">
+                        @switch (Model.PaymentStatus)
+                        {
+                            case "Completed":
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check me-1"></i>Completed
+                                </span>
+                                break;
+                            case "Pending":
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-clock me-1"></i>Pending
+                                </span>
+                                break;
+                            case "Failed":
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-times me-1"></i>Failed
+                                </span>
+                                break;
+                            case "Cancelled":
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-ban me-1"></i>Cancelled
+                                </span>
+                                break;
+                            default:
+                                <span class="badge bg-secondary">@Model.PaymentStatus</span>
+                                break;
+                        }
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.TransactionId))
+                {
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Transaction ID:</strong></div>
+                        <div class="col-sm-8">
+                            <code>@Model.TransactionId</code>
+                        </div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.PayPalPaymentId))
+                {
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>PayPal Payment ID:</strong></div>
+                        <div class="col-sm-8">
+                            <code>@Model.PayPalPaymentId</code>
+                        </div>
+                    </div>
+                }
+                @if (!string.IsNullOrEmpty(Model.PayPalPayerId))
+                {
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>PayPal Payer ID:</strong></div>
+                        <div class="col-sm-8">
+                            <code>@Model.PayPalPayerId</code>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-comment me-2"></i>Donor Message
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="bg-light p-3 rounded">
+                        <i class="fas fa-quote-left text-muted me-2"></i>
+                        <em>@Model.Message</em>
+                        <i class="fas fa-quote-right text-muted ms-2"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (Model.MasjidProject != null)
+{
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-building me-2"></i>Project Information
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h5>@Model.MasjidProject.Title</h5>
+                            <p class="text-muted">@Model.MasjidProject.Description</p>
+                            @if (!string.IsNullOrEmpty(Model.MasjidProject.Location))
+                            {
+                                <p><i class="fas fa-map-marker-alt me-2"></i>@Model.MasjidProject.Location</p>
+                            }
+                        </div>
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <div class="mb-2">
+                                    <strong>Progress</strong>
+                                </div>
+                                <div class="progress mb-2" style="height: 20px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: @Model.MasjidProject.ProgressPercentage%" 
+                                         aria-valuenow="@Model.MasjidProject.ProgressPercentage" 
+                                         aria-valuemin="0" aria-valuemax="100">
+                                        @Model.MasjidProject.ProgressPercentage%
+                                    </div>
+                                </div>
+                                <div class="small text-muted">
+                                    @Model.MasjidProject.CurrentAmount.ToString("C") of @Model.MasjidProject.TargetAmount.ToString("C")
+                                </div>
+                                <div class="mt-2">
+                                    <span class="badge bg-@(Model.MasjidProject.Status == "Completed" ? "success" : Model.MasjidProject.Status == "Fundraising" ? "primary" : "secondary")">
+                                        @Model.MasjidProject.Status
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

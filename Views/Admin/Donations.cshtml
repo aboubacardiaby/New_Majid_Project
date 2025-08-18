@@ -1,0 +1,462 @@
+@model AdminDonationManagementViewModel
+@{
+    ViewData["Title"] = "Donation Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row mb-4">
+    <div class="col-12">
+        <h1 class="h3 mb-2 text-gray-800">
+            <i class="fas fa-donate me-2"></i>Donation Management
+        </h1>
+        <p class="mb-4">Monitor and manage all donations to community projects.</p>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card primary">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-dollar-sign fa-2x text-primary"></i>
+                </div>
+                <div>
+                    <div class="stats-value">@Model.TotalAmount.ToString("C")</div>
+                    <div class="stats-label">Total Raised</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card success">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-users fa-2x text-success"></i>
+                </div>
+                <div>
+                    <div class="stats-value">@Model.TotalCount</div>
+                    <div class="stats-label">Total Donations</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card warning">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-chart-line fa-2x text-warning"></i>
+                </div>
+                <div>
+                    <div class="stats-value">@((Model.TotalCount > 0 ? Model.TotalAmount / Model.TotalCount : 0).ToString("C"))</div>
+                    <div class="stats-label">Average Donation</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="stats-card info">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <i class="fas fa-calendar fa-2x text-info"></i>
+                </div>
+                <div>
+                    <div class="stats-value">@Model.Donations.Where(d => d.DonationDate >= DateTime.Today.AddDays(-30)).Count()</div>
+                    <div class="stats-label">This Month</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-filter me-2"></i>Filters and Search
+        </h6>
+    </div>
+    <div class="card-body">
+        <form method="get" asp-action="Donations">
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="form-group mb-3">
+                        <label for="SearchTerm" class="form-label">Search Donor</label>
+                        <input asp-for="FilterOptions.SearchTerm" class="form-control" placeholder="Enter donor name or email" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group mb-3">
+                        <label for="PaymentStatus" class="form-label">Payment Status</label>
+                        <select asp-for="FilterOptions.PaymentStatus" class="form-control">
+                            <option value="">All Statuses</option>
+                            <option value="Completed">Completed</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Failed">Failed</option>
+                            <option value="Cancelled">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group mb-3">
+                        <label for="PaymentMethod" class="form-label">Payment Method</label>
+                        <select asp-for="FilterOptions.PaymentMethod" class="form-control">
+                            <option value="">All Methods</option>
+                            <option value="PayPal">PayPal</option>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group mb-3">
+                        <label for="StartDate" class="form-label">From Date</label>
+                        <input asp-for="FilterOptions.StartDate" type="date" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group mb-3">
+                        <label for="EndDate" class="form-label">To Date</label>
+                        <input asp-for="FilterOptions.EndDate" type="date" class="form-control" />
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <div class="form-group mb-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div>
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    <div class="form-group mb-3">
+                        <label for="MinAmount" class="form-label">Min Amount</label>
+                        <input asp-for="FilterOptions.MinAmount" type="number" step="0.01" class="form-control" placeholder="0.00" />
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group mb-3">
+                        <label for="MaxAmount" class="form-label">Max Amount</label>
+                        <input asp-for="FilterOptions.MaxAmount" type="number" step="0.01" class="form-control" placeholder="1000.00" />
+                    </div>
+                </div>
+                <div class="col-md-8">
+                    <div class="form-group mb-3">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-filter me-2"></i>Apply Filters
+                            </button>
+                            <a href="@Url.Action("Donations")" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Clear Filters
+                            </a>
+                            <button type="button" class="btn btn-success" onclick="exportDonations()">
+                                <i class="fas fa-file-excel me-2"></i>Export Excel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Donations Table -->
+<div class="card">
+    <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">
+            <i class="fas fa-list me-2"></i>Donations List
+            <span class="badge bg-primary ms-2">@Model.TotalCount Total</span>
+        </h6>
+    </div>
+    <div class="card-body">
+        @if (Model.Donations.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover admin-table" id="donationsTable">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Donor</th>
+                            <th>Project</th>
+                            <th>Amount</th>
+                            <th>Payment Method</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var donation in Model.Donations)
+                        {
+                            <tr data-donation-id="@donation.Id">
+                                <td>
+                                    <div class="fw-bold">@donation.DonationDate.ToString("MMM dd, yyyy")</div>
+                                    <small class="text-muted">@donation.DonationDate.ToString("h:mm tt")</small>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div>
+                                            <div class="fw-bold">
+                                                @if (donation.IsAnonymous)
+                                                {
+                                                    <i class="fas fa-user-secret me-1 text-muted"></i><text>Anonymous</text>
+                                                }
+                                                else
+                                                {
+                                                    @donation.DonorName
+                                                }
+                                            </div>
+                                            @if (!donation.IsAnonymous && !string.IsNullOrEmpty(donation.Email))
+                                            {
+                                                <small class="text-muted">@donation.Email</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-bold">@donation.MasjidProject.Title</div>
+                                    @if (!string.IsNullOrEmpty(donation.Message))
+                                    {
+                                        <small class="text-muted d-block" title="@donation.Message">
+                                            "@(donation.Message.Length > 50 ? donation.Message.Substring(0, 50) + "..." : donation.Message)"
+                                        </small>
+                                    }
+                                </td>
+                                <td>
+                                    <span class="fw-bold text-success fs-5">@donation.Amount.ToString("C")</span>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">@donation.PaymentMethod</span>
+                                </td>
+                                <td>
+                                    @switch (donation.PaymentStatus)
+                                    {
+                                        case "Completed":
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check me-1"></i>Completed
+                                            </span>
+                                            break;
+                                        case "Pending":
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>Pending
+                                            </span>
+                                            break;
+                                        case "Failed":
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-times me-1"></i>Failed
+                                            </span>
+                                            break;
+                                        case "Cancelled":
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-ban me-1"></i>Cancelled
+                                            </span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary">@donation.PaymentStatus</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="viewDonationDetails(@donation.Id)" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        @if (!string.IsNullOrEmpty(donation.Email))
+                                        {
+                                            <button type="button" class="btn btn-sm btn-outline-secondary" onclick="sendThankYouEmail(@donation.Id)" title="Send Thank You Email">
+                                                <i class="fas fa-envelope"></i>
+                                            </button>
+                                        }
+                                        @if (donation.PaymentStatus == "Pending")
+                                        {
+                                            <button type="button" class="btn btn-sm btn-outline-warning" onclick="updatePaymentStatus(@donation.Id, 'Completed')" title="Mark as Completed">
+                                                <i class="fas fa-check"></i>
+                                            </button>
+                                        }
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Donations pagination" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.PageNumber <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Donations", new { page = Model.PageNumber - 1, FilterOptions = Model.FilterOptions })">
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </a>
+                        </li>
+                        
+                        @for (int i = Math.Max(1, Model.PageNumber - 2); i <= Math.Min(Model.TotalPages, Model.PageNumber + 2); i++)
+                        {
+                            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("Donations", new { page = i, FilterOptions = Model.FilterOptions })">@i</a>
+                            </li>
+                        }
+                        
+                        <li class="page-item @(Model.PageNumber >= Model.TotalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("Donations", new { page = Model.PageNumber + 1, FilterOptions = Model.FilterOptions })">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-donate fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">No Donations Found</h4>
+                <p class="text-muted">
+                    @if (Model.FilterOptions.SearchTerm != null || Model.FilterOptions.StartDate != null || Model.FilterOptions.EndDate != null)
+                    {
+                        <span>No donations match your current filters. Try adjusting your search criteria.</span>
+                    }
+                    else
+                    {
+                        <span>No donations have been made yet. Donations will appear here once received.</span>
+                    }
+                </p>
+                @if (Model.FilterOptions.SearchTerm != null || Model.FilterOptions.StartDate != null || Model.FilterOptions.EndDate != null)
+                {
+                    <a href="@Url.Action("Donations")" class="btn btn-outline-primary">
+                        <i class="fas fa-times me-2"></i>Clear Filters
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Donation Details Modal -->
+<div class="modal fade" id="donationDetailsModal" tabindex="-1" aria-labelledby="donationDetailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="donationDetailsModalLabel">
+                    <i class="fas fa-donate me-2"></i>Donation Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="donationDetailsContent">
+                <!-- Content will be loaded dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // View donation details
+        function viewDonationDetails(donationId) {
+            fetch(`/Admin/GetDonationDetails/${donationId}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('donationDetailsContent').innerHTML = html;
+                    new bootstrap.Modal(document.getElementById('donationDetailsModal')).show();
+                })
+                .catch(error => {
+                    console.error('Error loading donation details:', error);
+                    AdminPanel.showNotification('Error', 'Failed to load donation details', 'error');
+                });
+        }
+
+        // Send thank you email
+        function sendThankYouEmail(donationId) {
+            if (confirm('Send a thank you email to this donor?')) {
+                fetch(`/Admin/SendThankYouEmail/${donationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        AdminPanel.showNotification('Success', 'Thank you email sent successfully!', 'success');
+                    } else {
+                        AdminPanel.showNotification('Error', data.message || 'Failed to send email', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error sending email:', error);
+                    AdminPanel.showNotification('Error', 'Failed to send thank you email', 'error');
+                });
+            }
+        }
+
+        // Update payment status
+        function updatePaymentStatus(donationId, status) {
+            if (confirm(`Mark this donation as ${status.toLowerCase()}?`)) {
+                fetch(`/Admin/UpdatePaymentStatus/${donationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                    },
+                    body: JSON.stringify({ status: status })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        AdminPanel.showNotification('Success', 'Payment status updated successfully!', 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        AdminPanel.showNotification('Error', data.message || 'Failed to update status', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error updating status:', error);
+                    AdminPanel.showNotification('Error', 'Failed to update payment status', 'error');
+                });
+            }
+        }
+
+        // Export donations to Excel
+        function exportDonations() {
+            const currentParams = new URLSearchParams(window.location.search);
+            currentParams.set('export', 'excel');
+            window.location.href = `/Admin/ExportDonations?${currentParams.toString()}`;
+        }
+
+        // Initialize DataTables if available
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof $.fn.DataTable !== 'undefined') {
+                $('#donationsTable').DataTable({
+                    pageLength: 25,
+                    order: [[0, 'desc']], // Sort by date descending
+                    columnDefs: [
+                        { orderable: false, targets: [6] } // Disable sorting on Actions column
+                    ],
+                    language: {
+                        search: "Search donations:",
+                        lengthMenu: "Show _MENU_ donations per page",
+                        info: "Showing _START_ to _END_ of _TOTAL_ donations",
+                        paginate: {
+                            first: "First",
+                            last: "Last",
+                            next: "Next",
+                            previous: "Previous"
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+}

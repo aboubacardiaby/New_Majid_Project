@@ -1,0 +1,205 @@
+@model MasjidProject
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<section class="page-header">
+    <div class="container">
+        <h1><i class="fas fa-mosque"></i> @Model.Title</h1>
+        <p>Building a spiritual home for our community - @Model.Status</p>
+    </div>
+</section>
+
+<section class="masjid-project-detailed">
+    <div class="container">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                <i class="fas fa-check-circle"></i>
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        <div class="project-main-grid">
+            <div class="project-main-content">
+                <div class="project-overview">
+                    <h2>Project Overview</h2>
+                    <p>@Model.Description</p>
+                    
+                    <div class="project-details">
+                        <div class="detail-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <h4>Location</h4>
+                                <p>@Model.Location</p>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-calendar-check"></i>
+                            <div>
+                                <h4>Target Completion</h4>
+                                <p>@Model.TargetCompletionDate?.ToString("MMMM yyyy") ?? "To be determined"</p>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-info-circle"></i>
+                            <div>
+                                <h4>Current Status</h4>
+                                <p>@Model.Status</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model.Updates))
+                {
+                    <div class="project-updates">
+                        <h3><i class="fas fa-bullhorn"></i> Latest Updates</h3>
+                        <div class="update-content">
+                            <p>@Model.Updates</p>
+                            <small class="text-muted">Last updated: @Model.CreatedDate.ToString("MMMM d, yyyy")</small>
+                        </div>
+                    </div>
+                }
+
+                <div class="masjid-features">
+                    <h3>What Your Masjid Will Include</h3>
+                    <div class="features-grid">
+                        <div class="feature-item">
+                            <i class="fas fa-pray"></i>
+                            <h4>Main Prayer Hall</h4>
+                            <p>Spacious area for daily prayers and Jummah congregation</p>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-female"></i>
+                            <h4>Women's Prayer Area</h4>
+                            <p>Dedicated space for sisters with proper facilities</p>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-graduation-cap"></i>
+                            <h4>Education Rooms</h4>
+                            <p>Classrooms for Quran studies and Islamic education</p>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-utensils"></i>
+                            <h4>Community Kitchen</h4>
+                            <p>Facilities for iftar and community meals</p>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-car"></i>
+                            <h4>Parking Facilities</h4>
+                            <p>Adequate parking for community members</p>
+                        </div>
+                        <div class="feature-item">
+                            <i class="fas fa-wheelchair"></i>
+                            <h4>Accessibility</h4>
+                            <p>Full accessibility compliance for all community members</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="project-sidebar">
+                <div class="fundraising-card">
+                    <div class="funding-stats">
+                        <div class="progress-circle">
+                            <div class="progress-value">@Model.ProgressPercentage%</div>
+                        </div>
+                        
+                        <div class="funding-details">
+                            <div class="amount-raised">
+                                <h3>${@Model.CurrentAmount:N0}</h3>
+                                <p>raised of ${@Model.TargetAmount:N0} goal</p>
+                            </div>
+                            
+                            <div class="funding-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: @Model.ProgressPercentage%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="time-stats">
+                                <div class="time-stat">
+                                    <strong>@Model.DaysRemaining</strong>
+                                    <span>Days Left</span>
+                                </div>
+                                <div class="time-stat">
+                                    <strong>${@((Model.TargetAmount - Model.CurrentAmount)):N0}</strong>
+                                    <span>Still Needed</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="donation-actions">
+                        <a asp-action="Donate" asp-route-id="@Model.Id" class="btn btn-primary btn-lg btn-block">
+                            <i class="fas fa-heart"></i> Donate Now
+                        </a>
+                        <p class="donation-note">
+                            <i class="fas fa-shield-alt"></i>
+                            Your donation is secure and goes directly to the project
+                        </p>
+                    </div>
+                </div>
+
+                <div class="project-impact">
+                    <h4>Impact of Your Donation</h4>
+                    <div class="impact-items">
+                        <div class="impact-item">
+                            <span class="amount">$50</span>
+                            <span class="description">Sponsor prayer rugs for the masjid</span>
+                        </div>
+                        <div class="impact-item">
+                            <span class="amount">$100</span>
+                            <span class="description">Support classroom equipment</span>
+                        </div>
+                        <div class="impact-item">
+                            <span class="amount">$250</span>
+                            <span class="description">Contribute to sound system</span>
+                        </div>
+                        <div class="impact-item">
+                            <span class="amount">$500</span>
+                            <span class="description">Help with construction materials</span>
+                        </div>
+                        <div class="impact-item">
+                            <span class="amount">$1,000</span>
+                            <span class="description">Sponsor a section of the building</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="community-support">
+    <div class="container">
+        <div class="support-message">
+            <h2>Join Us in This Noble Cause</h2>
+            <p class="lead">"Whoever builds a mosque for Allah, Allah will build for him a house like it in Paradise." - Prophet Muhammad (PBUH)</p>
+            
+            <div class="support-ways">
+                <div class="support-way">
+                    <i class="fas fa-hand-holding-heart"></i>
+                    <h4>Donate</h4>
+                    <p>Make a financial contribution to support the construction</p>
+                </div>
+                <div class="support-way">
+                    <i class="fas fa-share-alt"></i>
+                    <h4>Share</h4>
+                    <p>Spread the word in your network and social media</p>
+                </div>
+                <div class="support-way">
+                    <i class="fas fa-hands"></i>
+                    <h4>Volunteer</h4>
+                    <p>Offer your time and skills to help with the project</p>
+                </div>
+                <div class="support-way">
+                    <i class="fas fa-pray"></i>
+                    <h4>Pray</h4>
+                    <p>Make du'a for the success of this project</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

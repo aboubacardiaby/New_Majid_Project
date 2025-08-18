@@ -1,0 +1,162 @@
+@model HomeViewModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<section class="hero">
+    <div class="hero-content">
+        <h1>Welcome to the Gambian Muslim Community</h1>
+        <h2>Minnesota</h2>
+        <p>Building bridges, strengthening faith, and serving our community with Islamic values</p>
+        <div class="hero-buttons">
+            <a asp-action="About" class="btn btn-primary">Learn More</a>
+            <a asp-action="Events" class="btn btn-secondary">Upcoming Events</a>
+        </div>
+    </div>
+    <div class="islamic-pattern"></div>
+</section>
+
+@if (Model.FeaturedMasjidProject != null)
+{
+    <section class="masjid-project-highlight">
+        <div class="container">
+            <div class="project-highlight-card">
+                <div class="project-content">
+                    <div class="project-header">
+                        <i class="fas fa-mosque project-icon"></i>
+                        <div>
+                            <h2>@Model.FeaturedMasjidProject.Title</h2>
+                            <p class="project-status">Status: <span class="status-badge">@Model.FeaturedMasjidProject.Status</span></p>
+                        </div>
+                    </div>
+                    
+                    <p class="project-description">@Model.FeaturedMasjidProject.Description</p>
+                    
+                    <div class="project-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-target"></i>
+                            <div>
+                                <h4>Goal</h4>
+                                <p>${@Model.FeaturedMasjidProject.TargetAmount:N0}</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-hand-holding-usd"></i>
+                            <div>
+                                <h4>Raised</h4>
+                                <p>${@Model.FeaturedMasjidProject.CurrentAmount:N0}</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-percentage"></i>
+                            <div>
+                                <h4>Progress</h4>
+                                <p>@Model.FeaturedMasjidProject.ProgressPercentage%</p>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-calendar-alt"></i>
+                            <div>
+                                <h4>Days Left</h4>
+                                <p>@Model.FeaturedMasjidProject.DaysRemaining</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: @Model.FeaturedMasjidProject.ProgressPercentage%"></div>
+                    </div>
+                    
+                    <div class="project-actions">
+                        <a asp-action="Donate" asp-route-id="@Model.FeaturedMasjidProject.Id" class="btn btn-primary btn-lg">
+                            <i class="fas fa-heart"></i> Donate Now
+                        </a>
+                        <a asp-action="MasjidProject" asp-route-id="@Model.FeaturedMasjidProject.Id" class="btn btn-secondary">
+                            <i class="fas fa-info-circle"></i> Learn More
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+<section class="about">
+    <div class="container">
+        <h2>About Our Community</h2>
+        <div class="about-grid">
+            <div class="about-text">
+                <h3>Our Mission</h3>
+                <p>The Gambian Muslim Community in Minnesota is dedicated to preserving our Islamic faith and Gambian cultural heritage while integrating into the broader Minnesota community. We strive to provide spiritual guidance, educational opportunities, and social support for Gambian Muslims and their families.</p>
+                
+                <h3>Our Values</h3>
+                <ul>
+                    <li><i class="fas fa-heart"></i> Faith and Spirituality</li>
+                    <li><i class="fas fa-users"></i> Community Unity</li>
+                    <li><i class="fas fa-graduation-cap"></i> Education and Learning</li>
+                    <li><i class="fas fa-hands-helping"></i> Service to Others</li>
+                    <li><i class="fas fa-globe-americas"></i> Cultural Preservation</li>
+                </ul>
+            </div>
+            <div class="about-image">
+                <div class="mosque-illustration">
+                    <i class="fas fa-mosque"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="services">
+    <div class="container">
+        <h2>Our Services</h2>
+        <div class="services-grid">
+            @foreach (var service in Model.Services)
+            {
+                <div class="service-card">
+                    <i class="@service.IconClass"></i>
+                    <h3>@service.Title</h3>
+                    <p>@service.Description</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="events">
+    <div class="container">
+        <h2>Upcoming Events</h2>
+        <div class="events-grid">
+            @foreach (var eventItem in Model.UpcomingEvents)
+            {
+                <div class="event-card">
+                    <div class="event-date">
+                        <span class="month">@eventItem.EventDate.ToString("MMM")</span>
+                        <span class="day">@eventItem.EventDate.Day</span>
+                    </div>
+                    <div class="event-info">
+                        <h3>@eventItem.Title</h3>
+                        <p><i class="fas fa-clock"></i> @(DateTime.Today.Add(eventItem.StartTime).ToString("h:mm tt")) - @(DateTime.Today.Add(eventItem.EndTime).ToString("h:mm tt"))</p>
+                        <p><i class="fas fa-map-marker-alt"></i> @eventItem.Location</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="prayer-times">
+    <div class="container">
+        <h2>Prayer Times - @Model.PrayerSchedule.City</h2>
+        <div class="prayer-schedule">
+            @foreach (var prayer in Model.PrayerSchedule.Prayers)
+            {
+                <div class="prayer-card @(prayer.IsNext ? "next-prayer" : "")">
+                    <h3>@prayer.Name</h3>
+                    <p class="time">@(DateTime.Today.Add(prayer.Time).ToString("h:mm tt"))</p>
+                </div>
+            }
+        </div>
+        <p class="prayer-note">Prayer times are approximate for @Model.PrayerSchedule.City. Please verify with local mosque for exact times.</p>
+    </div>
+</section>

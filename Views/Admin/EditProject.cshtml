@@ -1,0 +1,272 @@
+@model MasjidProject
+@{
+    ViewData["Title"] = "Edit Project";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-edit me-2"></i>
+                    Edit Project: @Model.Title
+                </h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="EditProject" method="post">
+                    @Html.AntiForgeryToken()
+                    <input asp-for="Id" type="hidden" />
+                    <input asp-for="CreatedDate" type="hidden" />
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Title" class="form-label">Project Title</label>
+                                <input asp-for="Title" class="form-control" placeholder="Enter project title" />
+                                <span asp-validation-for="Title" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="Status" class="form-label">Project Status</label>
+                                <select asp-for="Status" class="form-select">
+                                    <option value="Planning">Planning</option>
+                                    <option value="Fundraising">Fundraising</option>
+                                    <option value="Construction">Construction</option>
+                                    <option value="Completed">Completed</option>
+                                </select>
+                                <span asp-validation-for="Status" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Project Description</label>
+                        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Describe the project in detail..."></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="TargetAmount" class="form-label">Target Amount ($)</label>
+                                <input asp-for="TargetAmount" class="form-control" type="number" step="0.01" min="1" placeholder="0.00" />
+                                <span asp-validation-for="TargetAmount" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="CurrentAmount" class="form-label">Current Amount ($)</label>
+                                <input asp-for="CurrentAmount" class="form-control" type="number" step="0.01" min="0" placeholder="0.00" />
+                                <span asp-validation-for="CurrentAmount" class="text-danger"></span>
+                                <div class="form-text">This is automatically calculated from donations, but can be manually adjusted if needed.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="StartDate" class="form-label">Start Date</label>
+                                <input asp-for="StartDate" class="form-control" type="date" />
+                                <span asp-validation-for="StartDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label asp-for="TargetCompletionDate" class="form-label">Target Completion Date (Optional)</label>
+                                <input asp-for="TargetCompletionDate" class="form-control" type="date" />
+                                <span asp-validation-for="TargetCompletionDate" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Location" class="form-label">Project Location (Optional)</label>
+                        <input asp-for="Location" class="form-control" placeholder="Enter project location" />
+                        <span asp-validation-for="Location" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="ImageUrl" class="form-label">Project Image URL (Optional)</label>
+                        <input asp-for="ImageUrl" class="form-control" type="url" placeholder="https://example.com/image.jpg" />
+                        <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        <div class="form-text">Enter a URL for the project image that will be displayed to visitors.</div>
+                        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                        {
+                            <div class="mt-2">
+                                <img src="@Model.ImageUrl" alt="Current project image" class="img-thumbnail" style="max-width: 200px;" />
+                            </div>
+                        }
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Updates" class="form-label">Project Updates (Optional)</label>
+                        <textarea asp-for="Updates" class="form-control" rows="3" placeholder="Any updates or news about the project..."></textarea>
+                        <span asp-validation-for="Updates" class="text-danger"></span>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input asp-for="IsFeatured" class="form-check-input" type="checkbox" />
+                                    <label asp-for="IsFeatured" class="form-check-label">
+                                        Featured Project
+                                    </label>
+                                    <div class="form-text">Featured projects are highlighted on the homepage. Only one project can be featured at a time.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                                    <label asp-for="IsActive" class="form-check-label">
+                                        Active Project
+                                    </label>
+                                    <div class="form-text">Active projects are visible to visitors and accept donations.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-save me-1"></i>
+                            Update Project
+                        </button>
+                        <a href="@Url.Action("Projects")" class="btn btn-secondary">
+                            <i class="fas fa-times me-1"></i>
+                            Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-chart-pie me-2"></i>
+                    Project Progress
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="text-center">
+                    <div class="mb-3">
+                        <div class="progress" style="height: 20px;">
+                            <div class="progress-bar @(Model.ProgressPercentage >= 100 ? "bg-success" : Model.ProgressPercentage >= 75 ? "bg-info" : Model.ProgressPercentage >= 50 ? "bg-warning" : "bg-danger")" 
+                                 role="progressbar" 
+                                 style="width: @Math.Min(Model.ProgressPercentage, 100)%"
+                                 aria-valuenow="@Model.ProgressPercentage" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="100">
+                                @Model.ProgressPercentage%
+                            </div>
+                        </div>
+                    </div>
+                    <h5 class="text-success">$@Model.CurrentAmount.ToString("N2")</h5>
+                    <p class="text-muted">of $@Model.TargetAmount.ToString("N2") goal</p>
+                    
+                    @if (Model.TargetCompletionDate.HasValue)
+                    {
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <span>Target Date:</span>
+                            <strong>@Model.TargetCompletionDate.Value.ToString("MMM dd, yyyy")</strong>
+                        </div>
+                        @if (Model.DaysRemaining > 0)
+                        {
+                            <div class="d-flex justify-content-between">
+                                <span>Days Remaining:</span>
+                                <strong class="text-@(Model.DaysRemaining <= 30 ? "danger" : Model.DaysRemaining <= 90 ? "warning" : "success")">
+                                    @Model.DaysRemaining
+                                </strong>
+                            </div>
+                        }
+                        else if (Model.TargetCompletionDate.Value < DateTime.Today)
+                        {
+                            <div class="text-danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Target date has passed
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Project Information
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Created:</span>
+                    <strong>@Model.CreatedDate.ToString("MMM dd, yyyy")</strong>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Status:</span>
+                    <span class="badge @(Model.Status switch {
+                        "Planning" => "bg-secondary",
+                        "Fundraising" => "bg-info",
+                        "Construction" => "bg-warning", 
+                        "Completed" => "bg-success",
+                        _ => "bg-secondary"
+                    })">
+                        @Model.Status
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                    <span>Featured:</span>
+                    <strong class="text-@(Model.IsFeatured ? "warning" : "muted")">
+                        @(Model.IsFeatured ? "Yes" : "No")
+                    </strong>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <span>Active:</span>
+                    <strong class="text-@(Model.IsActive ? "success" : "danger")">
+                        @(Model.IsActive ? "Yes" : "No")
+                    </strong>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Preview image when URL is changed
+            $('#ImageUrl').on('blur', function() {
+                const imageUrl = $(this).val();
+                const existingPreview = $(this).siblings('.mt-2');
+                
+                if (imageUrl && imageUrl !== '@Model.ImageUrl') {
+                    // Remove existing preview
+                    $('#newImagePreview').remove();
+                    
+                    // Add new preview
+                    const preview = `
+                        <div id="newImagePreview" class="mt-2">
+                            <small class="text-muted">New image preview:</small><br>
+                            <img src="${imageUrl}" alt="Preview" class="img-thumbnail" style="max-width: 200px;" 
+                                 onerror="this.style.display='none'; $('#imageError').show();" />
+                            <div id="imageError" style="display:none;" class="text-danger small">
+                                <i class="fas fa-exclamation-triangle"></i> Could not load image
+                            </div>
+                        </div>
+                    `;
+                    $(this).parent().append(preview);
+                }
+            });
+        });
+    </script>
+}

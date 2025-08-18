@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Gambian Muslim Community in Minnesota</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/GambianMuslimCommunity.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="logo">
+                    <i class="fas fa-mosque"></i>
+                    <div>
+                        <h1>Gambian Muslim Community</h1>
+                        <p>Minnesota</p>
+                    </div>
+                </div>
+                <ul class="nav-menu" id="nav-menu">
+                    <li><a asp-action="Index" asp-controller="Home">Home</a></li>
+                    <li><a asp-action="About" asp-controller="Home">About</a></li>
+                    <li><a asp-action="Services" asp-controller="Home">Services</a></li>
+                    <li><a asp-action="Events" asp-controller="Home">Events</a></li>
+                    <li><a asp-action="MasjidProject" asp-controller="Home">Masjid Project</a></li>
+                    <li><a asp-action="PrayerTimes" asp-controller="Home">Prayer Times</a></li>
+                    <li><a asp-action="Contact" asp-controller="Home">Contact</a></li>
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li><a asp-action="Dashboard" asp-controller="Admin"><i class="fas fa-tachometer-alt"></i> Admin</a></li>
+                        <li>
+                            <form asp-action="Logout" asp-controller="Admin" method="post" style="display: inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="nav-logout-btn">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </button>
+                            </form>
+                        </li>
+                    }
+                    else
+                    {
+                        <li><a asp-action="Login" asp-controller="Admin"><i class="fas fa-sign-in-alt"></i> Admin Login</a></li>
+                    }
+                </ul>
+                <div class="hamburger" id="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="footer-logo">
+                        <i class="fas fa-mosque"></i>
+                        <div>
+                            <h3>Gambian Muslim Community</h3>
+                            <p>Minnesota</p>
+                        </div>
+                    </div>
+                    <p>Building bridges, strengthening faith, and serving our community with Islamic values.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a asp-action="About" asp-controller="Home">About</a></li>
+                        <li><a asp-action="Services" asp-controller="Home">Services</a></li>
+                        <li><a asp-action="Events" asp-controller="Home">Events</a></li>
+                        <li><a asp-action="PrayerTimes" asp-controller="Home">Prayer Times</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <ul>
+                        <li><a href="#">Islamic Calendar</a></li>
+                        <li><a href="#">Quran Online</a></li>
+                        <li><a href="#">Hadith Collection</a></li>
+                        <li><a href="#">Community Guidelines</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Follow Us</h4>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; @DateTime.Now.Year Gambian Muslim Community in Minnesota. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

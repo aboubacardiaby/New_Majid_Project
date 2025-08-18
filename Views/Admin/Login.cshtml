@@ -1,0 +1,295 @@
+@model AdminLoginViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Admin Login";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Gambian Muslim Community</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            max-width: 800px;
+            width: 100%;
+            min-height: 500px;
+            display: flex;
+        }
+
+        .login-left {
+              position: relative;        /* confine the absolute child to this column */
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 60px 40px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .login-right {
+            padding: 60px 40px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .islamic-pattern {
+            position: absolute;
+    inset: 0;
+    opacity: 0.1;
+    pointer-events: none;      /* make the overlay non-interactive */
+    background-image: url("data:image/svg+xml,%3Csvg ... %3E");
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .welcome-text h2 {
+            font-weight: 300;
+            margin-bottom: 15px;
+        }
+
+        .welcome-text p {
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .form-title {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .form-title h3 {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-control {
+            height: 50px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 0 20px 0 50px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+
+        .form-group i {
+            position: absolute;
+            left: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #adb5bd;
+            font-size: 18px;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            height: 50px;
+            border-radius: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .form-check {
+            margin: 20px 0;
+        }
+
+        .form-check-input:checked {
+            background-color: #667eea;
+            border-color: #667eea;
+        }
+
+        .text-danger {
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+
+        @@media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+                margin: 20px;
+            }
+
+            .login-left {
+                padding: 40px 30px;
+            }
+
+            .login-right {
+                padding: 40px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-left">
+            <div class="islamic-pattern"></div>
+            <div class="logo">
+                <i class="fas fa-mosque"></i>
+            </div>
+            <div class="welcome-text">
+                <h2>Welcome Back</h2>
+                <p>Assalamu Alaikum! Please sign in to access the admin panel and manage the Gambian Muslim Community website.</p>
+                <p class="mt-4">
+                    <strong>Bismillah</strong> - In the name of Allah, the Most Gracious, the Most Merciful
+                </p>
+            </div>
+        </div>
+
+        <div class="login-right">
+            <div class="form-title">
+                <h3>Admin Login</h3>
+                <p class="text-muted">Enter your credentials to continue</p>
+            </div>
+
+            <form asp-action="Login" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="ReturnUrl" />
+
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+                    </div>
+                }
+
+                <div class="form-group">
+                    <i class="fas fa-user"></i>
+                    <input asp-for="Username" class="form-control" placeholder="Username" autocomplete="username" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <i class="fas fa-lock"></i>
+                    <input asp-for="Password" type="password" class="form-control" placeholder="Password" autocomplete="current-password" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-check">
+                    <input asp-for="RememberMe" class="form-check-input" type="checkbox" />
+                    <label asp-for="RememberMe" class="form-check-label">
+                        Remember me for 30 days
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-login w-100 mb-3">
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    Sign In
+                </button>
+
+                <div class="text-center">
+                    <a href="@Url.Action("Index", "Home")" class="text-muted">
+                        <i class="fas fa-arrow-left me-1"></i>
+                        Back to Website
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery-validation/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script>
+        // Auto-focus the first empty input
+        document.addEventListener('DOMContentLoaded', function() {
+            const usernameInput = document.querySelector('input[name="Username"]');
+            const passwordInput = document.querySelector('input[name="Password"]');
+            const submitButton = document.querySelector('button[type="submit"]');
+            const form = document.querySelector('form');
+            
+            // Auto-focus
+            if (!usernameInput.value) {
+                usernameInput.focus();
+            } else if (!passwordInput.value) {
+                passwordInput.focus();
+            }
+            
+            // Ensure form submission works
+            if (form && submitButton) {
+                submitButton.addEventListener('click', function(e) {
+                    console.log('Sign In button clicked');
+                    
+                    // Basic validation
+                    if (!usernameInput.value.trim()) {
+                        alert('Please enter your username');
+                        usernameInput.focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    if (!passwordInput.value.trim()) {
+                        alert('Please enter your password');
+                        passwordInput.focus();
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    // Show loading state
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Signing In...';
+                    submitButton.disabled = true;
+                    
+                    // Allow form to submit naturally
+                    return true;
+                });
+                
+                // Handle form submission
+                form.addEventListener('submit', function(e) {
+                    console.log('Form submitted');
+                    // Form will submit naturally to the controller
+                });
+            }
+        });
+    </script>
+</body>
+</html>
