@@ -1,0 +1,585 @@
+@model GambianMuslimCommunity.Controllers.MembersManagementViewModel
+@{
+    ViewData["Title"] = "Members Management";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-users text-primary me-2"></i>
+        Members Management
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="/AdminMembers/Export?format=csv" class="btn btn-outline-success">
+                <i class="fas fa-download me-1"></i>
+                Export CSV
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Messages -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle me-2"></i>
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm bg-gradient-primary text-white">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Total Members</div>
+                        <div class="h4 mb-0 font-weight-bold">@Model.Stats.TotalMembers</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm bg-gradient-warning text-white">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Pending Approval</div>
+                        <div class="h4 mb-0 font-weight-bold">@Model.Stats.PendingMembers</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-clock fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm bg-gradient-success text-white">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Active Members</div>
+                        <div class="h4 mb-0 font-weight-bold">@Model.Stats.ActiveMembers</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-check fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card border-0 shadow-sm bg-gradient-danger text-white">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-uppercase mb-1">Suspended</div>
+                        <div class="h4 mb-0 font-weight-bold">@Model.Stats.SuspendedMembers</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-user-slash fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters and Search -->
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label for="status" class="form-label fw-bold">Filter by Status</label>
+                <select name="status" id="status" class="form-select" onchange="this.form.submit()">
+                    <option value="all" selected="@(Model.CurrentStatus == "all")">All Members</option>
+                    <option value="pending" selected="@(Model.CurrentStatus == "pending")">Pending (@Model.Stats.PendingMembers)</option>
+                    <option value="active" selected="@(Model.CurrentStatus == "active")">Active (@Model.Stats.ActiveMembers)</option>
+                    <option value="suspended" selected="@(Model.CurrentStatus == "suspended")">Suspended (@Model.Stats.SuspendedMembers)</option>
+                    <option value="rejected" selected="@(Model.CurrentStatus == "rejected")">Rejected (@Model.Stats.RejectedMembers)</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="search" class="form-label fw-bold">Search Members</label>
+                <div class="input-group">
+                    <input type="text" name="search" id="search" class="form-control" 
+                           placeholder="Search by name, email, phone, city..." value="@Model.SearchTerm" />
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i>
+                        Search
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <a href="/AdminMembers" class="btn btn-outline-secondary w-100">
+                    <i class="fas fa-times me-1"></i>
+                    Clear Filters
+                </a>
+            </div>
+            <input type="hidden" name="page" value="1" />
+        </form>
+    </div>
+</div>
+
+<!-- Members Table -->
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white border-bottom">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-list me-2 text-primary"></i>
+            @if (Model.CurrentStatus != "all")
+            {
+                <span class="text-capitalize">@Model.CurrentStatus</span>
+            }
+            else
+            {
+                <span>All</span>
+            }
+            Members
+            @if (!string.IsNullOrEmpty(Model.SearchTerm))
+            {
+                <small class="text-muted"> - Search: "@Model.SearchTerm"</small>
+            }
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        @if (Model.Members.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Member</th>
+                            <th>Contact</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                            <th>Registration</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var member in Model.Members)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle me-3">
+                                            @member.FullName.FirstOrDefault()
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">@member.FullName</div>
+                                            @if (!string.IsNullOrEmpty(member.Profession))
+                                            {
+                                                <small class="text-muted">@member.Profession</small>
+                                            }
+                                            @if (!string.IsNullOrEmpty(member.Nationality))
+                                            {
+                                                <small class="text-muted"> • @member.Nationality</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <i class="fas fa-envelope me-1 text-muted"></i>
+                                        <a href="mailto:@member.Email" class="text-decoration-none">@member.Email</a>
+                                    </div>
+                                    <div class="mt-1">
+                                        <i class="fas fa-phone me-1 text-muted"></i>
+                                        <a href="tel:@member.PhoneNumber" class="text-decoration-none">@member.PhoneNumber</a>
+                                    </div>
+                                </td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(member.City) || !string.IsNullOrEmpty(member.Country))
+                                    {
+                                        <div>
+                                            @if (!string.IsNullOrEmpty(member.City))
+                                            {
+                                                @member.City
+                                                if (!string.IsNullOrEmpty(member.Country))
+                                                {
+                                                    <text>, </text>
+                                                }
+                                            }
+                                            @member.Country
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">-</span>
+                                    }
+                                </td>
+                                <td>
+                                    @switch (member.MembershipStatus)
+                                    {
+                                        case "Pending":
+                                            <span class="badge bg-warning">
+                                                <i class="fas fa-clock me-1"></i>
+                                                Pending
+                                            </span>
+                                            break;
+                                        case "Active":
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>
+                                                Active
+                                            </span>
+                                            break;
+                                        case "Suspended":
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-pause-circle me-1"></i>
+                                                Suspended
+                                            </span>
+                                            break;
+                                        case "Rejected":
+                                            <span class="badge bg-secondary">
+                                                <i class="fas fa-times-circle me-1"></i>
+                                                Rejected
+                                            </span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-light text-dark">@member.MembershipStatus</span>
+                                            break;
+                                    }
+                                </td>
+                                <td>
+                                    <div>@member.RegistrationDate.ToString("MMM dd, yyyy")</div>
+                                    @if (member.ApprovedDate.HasValue)
+                                    {
+                                        <small class="text-success">
+                                            <i class="fas fa-check me-1"></i>
+                                            Approved @member.ApprovedDate.Value.ToString("MMM dd, yyyy")
+                                        </small>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a href="/AdminMembers/Details/@member.Id" class="btn btn-sm btn-outline-primary" title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="/AdminMembers/Edit/@member.Id" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-outline-info dropdown-toggle" 
+                                                data-bs-toggle="dropdown" title="Actions">
+                                            <i class="fas fa-cog"></i>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            @if (member.MembershipStatus == "Pending")
+                                            {
+                                                <li>
+                                                    <button type="button" class="dropdown-item text-success" 
+                                                            onclick="performAction(@member.Id, 'approve', '@member.FullName')">
+                                                        <i class="fas fa-check me-2"></i>
+                                                        Approve
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <button type="button" class="dropdown-item text-danger" 
+                                                            onclick="performActionWithReason(@member.Id, 'reject', '@member.FullName')">
+                                                        <i class="fas fa-times me-2"></i>
+                                                        Reject
+                                                    </button>
+                                                </li>
+                                            }
+                                            @if (member.MembershipStatus == "Active")
+                                            {
+                                                <li>
+                                                    <button type="button" class="dropdown-item text-warning" 
+                                                            onclick="performActionWithReason(@member.Id, 'suspend', '@member.FullName')">
+                                                        <i class="fas fa-pause me-2"></i>
+                                                        Suspend
+                                                    </button>
+                                                </li>
+                                            }
+                                            @if (member.MembershipStatus == "Suspended" || member.MembershipStatus == "Rejected")
+                                            {
+                                                <li>
+                                                    <button type="button" class="dropdown-item text-success" 
+                                                            onclick="performAction(@member.Id, 'reactivate', '@member.FullName')">
+                                                        <i class="fas fa-play me-2"></i>
+                                                        Reactivate
+                                                    </button>
+                                                </li>
+                                            }
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <button type="button" class="dropdown-item text-danger" 
+                                                        onclick="confirmDelete(@member.Id, '@member.FullName')">
+                                                    <i class="fas fa-trash me-2"></i>
+                                                    Delete
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <div class="d-flex justify-content-between align-items-center p-3 border-top">
+                    <div class="text-muted">
+                        Showing page @Model.CurrentPage of @Model.TotalPages
+                    </div>
+                    <nav>
+                        <ul class="pagination mb-0">
+                            @if (Model.HasPreviousPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="?status=@Model.CurrentStatus&search=@Model.SearchTerm&page=@(Model.CurrentPage - 1)">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                            }
+                            
+                            @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                            {
+                                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                    <a class="page-link" href="?status=@Model.CurrentStatus&search=@Model.SearchTerm&page=@i">@i</a>
+                                </li>
+                            }
+                            
+                            @if (Model.HasNextPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="?status=@Model.CurrentStatus&search=@Model.SearchTerm&page=@(Model.CurrentPage + 1)">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No Members Found</h5>
+                @if (!string.IsNullOrEmpty(Model.SearchTerm) || Model.CurrentStatus != "all")
+                {
+                    <p class="text-muted">Try adjusting your search criteria or filters.</p>
+                    <a href="/AdminMembers" class="btn btn-primary">
+                        <i class="fas fa-list me-1"></i>
+                        Show All Members
+                    </a>
+                }
+                else
+                {
+                    <p class="text-muted">No members have registered yet.</p>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Action Modal -->
+<div class="modal fade" id="actionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="actionModalTitle">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="actionModalMessage"></p>
+                <div id="reasonSection" style="display: none;">
+                    <label for="actionReason" class="form-label">Reason (optional):</label>
+                    <textarea id="actionReason" class="form-control" rows="3" placeholder="Enter reason for this action..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmActionBtn" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentMemberId = 0;
+        let currentAction = '';
+
+        function performAction(memberId, action, memberName) {
+            currentMemberId = memberId;
+            currentAction = action;
+            
+            const actionText = action.charAt(0).toUpperCase() + action.slice(1);
+            document.getElementById('actionModalTitle').textContent = `${actionText} Member`;
+            document.getElementById('actionModalMessage').innerHTML = 
+                `Are you sure you want to <strong>${action}</strong> the member <strong>${memberName}</strong>?`;
+            
+            document.getElementById('reasonSection').style.display = 'none';
+            document.getElementById('actionReason').value = '';
+            
+            const confirmBtn = document.getElementById('confirmActionBtn');
+            confirmBtn.className = `btn btn-${getButtonClass(action)}`;
+            confirmBtn.textContent = `${actionText}`;
+            
+            new bootstrap.Modal(document.getElementById('actionModal')).show();
+        }
+
+        function performActionWithReason(memberId, action, memberName) {
+            currentMemberId = memberId;
+            currentAction = action;
+            
+            const actionText = action.charAt(0).toUpperCase() + action.slice(1);
+            document.getElementById('actionModalTitle').textContent = `${actionText} Member`;
+            document.getElementById('actionModalMessage').innerHTML = 
+                `Are you sure you want to <strong>${action}</strong> the member <strong>${memberName}</strong>?`;
+            
+            document.getElementById('reasonSection').style.display = 'block';
+            document.getElementById('actionReason').value = '';
+            
+            const confirmBtn = document.getElementById('confirmActionBtn');
+            confirmBtn.className = `btn btn-${getButtonClass(action)}`;
+            confirmBtn.textContent = `${actionText}`;
+            
+            new bootstrap.Modal(document.getElementById('actionModal')).show();
+        }
+
+        function confirmDelete(memberId, memberName) {
+            if (confirm(`Are you sure you want to permanently delete the member "${memberName}"? This action cannot be undone.`)) {
+                submitAction(memberId, 'delete');
+            }
+        }
+
+        function getButtonClass(action) {
+            switch(action) {
+                case 'approve':
+                case 'reactivate':
+                    return 'success';
+                case 'suspend':
+                    return 'warning';
+                case 'reject':
+                case 'delete':
+                    return 'danger';
+                default:
+                    return 'primary';
+            }
+        }
+
+        document.getElementById('confirmActionBtn').addEventListener('click', function() {
+            const reason = document.getElementById('actionReason').value;
+            submitAction(currentMemberId, currentAction, reason);
+        });
+
+        function submitAction(memberId, action, reason = '') {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/AdminMembers/${action.charAt(0).toUpperCase() + action.slice(1)}`;
+            
+            // Add anti-forgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (token) {
+                const tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = '__RequestVerificationToken';
+                tokenInput.value = token.value;
+                form.appendChild(tokenInput);
+            }
+            
+            // Add member ID
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'id';
+            idInput.value = memberId;
+            form.appendChild(idInput);
+            
+            // Add reason if provided
+            if (reason) {
+                const reasonInput = document.createElement('input');
+                reasonInput.type = 'hidden';
+                reasonInput.name = 'reason';
+                reasonInput.value = reason;
+                form.appendChild(reasonInput);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+
+        // Auto-submit status filter
+        document.getElementById('status').addEventListener('change', function() {
+            this.form.submit();
+        });
+    </script>
+
+    @Html.AntiForgeryToken()
+    
+    <style>
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%) !important;
+        }
+        
+        .bg-gradient-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%) !important;
+        }
+        
+        .bg-gradient-success {
+            background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%) !important;
+        }
+        
+        .bg-gradient-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+        }
+        
+        .table th {
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .dropdown-menu {
+            border: 1px solid #e3e6f0;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        .btn-group .btn {
+            border-color: #e3e6f0;
+        }
+        
+        .card {
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+    </style>
+}

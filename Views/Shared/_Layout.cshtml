@@ -8,51 +8,425 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/GambianMuslimCommunity.styles.css" asp-append-version="true" />
+    <style>
+    /* ═══════════════════════════════════════════════════════
+       PROFESSIONAL TWO-TIER NAVIGATION
+       ═══════════════════════════════════════════════════════ */
+
+    /* Reset old header/nav styles */
+    header { all: unset; display: block; position: fixed; top: 0; width: 100%; z-index: 1000; }
+
+    /* ── Top utility bar ─────────────────────────────────── */
+    .nav-topbar {
+        background: #1a3d1e;
+        padding: 7px 0;
+        border-bottom: 1px solid rgba(212,175,55,.15);
+    }
+    .nav-topbar__inner {
+        max-width: 1280px; margin: 0 auto; padding: 0 24px;
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 16px;
+    }
+    .nav-topbar__left {
+        display: flex; align-items: center; gap: 20px;
+        flex-wrap: wrap;
+    }
+    .nav-topbar__left span {
+        display: flex; align-items: center; gap: 6px;
+        color: rgba(255,255,255,.65); font-size: .75rem;
+    }
+    .nav-topbar__left span i { color: #d4af37; font-size: .7rem; }
+
+    .nav-topbar__right {
+        display: flex; align-items: center; gap: 4px;
+    }
+    .nav-topbar__social {
+        display: flex; align-items: center; gap: 2px;
+        padding-right: 12px;
+        border-right: 1px solid rgba(255,255,255,.12);
+        margin-right: 8px;
+    }
+    .nav-topbar__social a {
+        width: 26px; height: 26px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        color: rgba(255,255,255,.55); font-size: .75rem;
+        text-decoration: none; transition: all .2s;
+    }
+    .nav-topbar__social a:hover { color: #d4af37; background: rgba(212,175,55,.1); }
+
+    .nav-admin-pill {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 4px 12px; border-radius: 14px;
+        font-size: .73rem; font-weight: 600; text-decoration: none;
+        transition: all .2s; white-space: nowrap;
+    }
+    .nav-admin-pill--login {
+        color: rgba(255,255,255,.6); border: 1px solid rgba(255,255,255,.15);
+    }
+    .nav-admin-pill--login:hover { color: #d4af37; border-color: rgba(212,175,55,.4); }
+    .nav-admin-pill--dashboard {
+        color: #d4af37; border: 1px solid rgba(212,175,55,.35);
+        background: rgba(212,175,55,.08);
+    }
+    .nav-admin-pill--dashboard:hover { background: rgba(212,175,55,.18); }
+    .nav-admin-pill--logout {
+        background: none; border: 1px solid rgba(220,53,69,.3);
+        color: rgba(255,255,255,.5); cursor: pointer; font-family: inherit;
+    }
+    .nav-admin-pill--logout:hover { border-color: #dc3545; color: #dc3545; background: rgba(220,53,69,.08); }
+
+    /* ── Main navbar ─────────────────────────────────────── */
+    .navbar {
+        background: rgba(255,255,255,.97);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 2px 16px rgba(0,0,0,.08);
+        padding: 0;
+        transition: box-shadow .3s;
+    }
+    .navbar.scrolled { box-shadow: 0 4px 24px rgba(0,0,0,.13); }
+
+    .nav-container {
+        max-width: 1280px; margin: 0 auto; padding: 0 24px;
+        display: flex; align-items: center; gap: 0;
+        height: 68px;
+    }
+
+    /* Logo */
+    .nav-logo {
+        display: flex; align-items: center; gap: 12px;
+        text-decoration: none; flex-shrink: 0;
+        margin-right: 32px;
+    }
+    .nav-logo__icon {
+        width: 42px; height: 42px; border-radius: 10px;
+        background: linear-gradient(135deg, #2c5530, #1a3d1e);
+        display: flex; align-items: center; justify-content: center;
+        color: #d4af37; font-size: 1.2rem;
+        box-shadow: 0 2px 8px rgba(44,85,48,.3);
+        flex-shrink: 0;
+    }
+    .nav-logo__text { line-height: 1.2; }
+    .nav-logo__name {
+        display: block; font-family: 'Amiri', serif;
+        font-size: 1.05rem; font-weight: 700;
+        color: #2c5530; white-space: nowrap;
+    }
+    .nav-logo__sub {
+        display: block; font-size: .7rem; color: #d4af37;
+        font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    }
+
+    /* Primary nav links */
+    .nav-links {
+        list-style: none; margin: 0; padding: 0;
+        display: flex; align-items: center; gap: 0;
+        flex: 1;
+    }
+    .nav-links > li > a {
+        display: flex; align-items: center;
+        height: 68px; padding: 0 14px;
+        text-decoration: none; font-size: .87rem; font-weight: 600;
+        color: #444; white-space: nowrap;
+        position: relative; transition: color .2s;
+    }
+    .nav-links > li > a::after {
+        content: ''; position: absolute; bottom: 0; left: 14px; right: 14px;
+        height: 3px; background: #d4af37; border-radius: 3px 3px 0 0;
+        transform: scaleX(0); transform-origin: center; transition: transform .25s;
+    }
+    .nav-links > li > a:hover,
+    .nav-links > li > a.active { color: #2c5530; }
+    .nav-links > li > a:hover::after,
+    .nav-links > li > a.active::after { transform: scaleX(1); }
+
+    /* Right action buttons */
+    .nav-actions {
+        display: flex; align-items: center; gap: 10px;
+        margin-left: auto; flex-shrink: 0;
+    }
+    .nav-track-btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 7px 16px; border-radius: 20px; font-size: .82rem; font-weight: 600;
+        color: #2c5530; border: 1.5px solid rgba(44,85,48,.25);
+        text-decoration: none; transition: all .2s; white-space: nowrap;
+    }
+    .nav-track-btn:hover {
+        border-color: #2c5530; background: rgba(44,85,48,.05);
+        text-decoration: none; color: #2c5530;
+    }
+    .nav-join-btn {
+        display: inline-flex; align-items: center; gap: 7px;
+        padding: 9px 20px; border-radius: 24px; font-size: .85rem; font-weight: 700;
+        background: linear-gradient(135deg, #2c5530, #1a3d1e);
+        color: #fff !important; text-decoration: none;
+        transition: all .25s; white-space: nowrap;
+        box-shadow: 0 3px 12px rgba(44,85,48,.3);
+    }
+    .nav-join-btn:hover {
+        transform: translateY(-2px); box-shadow: 0 6px 20px rgba(44,85,48,.35);
+        text-decoration: none;
+    }
+
+    /* Divider between primary links and actions */
+    .nav-divider {
+        width: 1px; height: 28px; background: rgba(0,0,0,.1);
+        margin: 0 14px; flex-shrink: 0;
+    }
+
+    /* ── Hamburger ───────────────────────────────────────── */
+    .hamburger {
+        display: none; flex-direction: column; justify-content: center;
+        gap: 5px; cursor: pointer; padding: 6px;
+        background: none; border: none; margin-left: 12px;
+    }
+    .hamburger span {
+        display: block; width: 24px; height: 2px;
+        background: #2c5530; border-radius: 2px;
+        transition: all .3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── Mobile drawer ───────────────────────────────────── */
+    .nav-drawer {
+        display: none; position: fixed;
+        top: 0; right: 0; bottom: 0; width: min(320px, 100vw);
+        background: #fff; z-index: 999;
+        box-shadow: -8px 0 40px rgba(0,0,0,.15);
+        flex-direction: column; overflow-y: auto;
+        transform: translateX(100%); transition: transform .35s cubic-bezier(.4,0,.2,1);
+    }
+    .nav-drawer.open { transform: translateX(0); }
+    .nav-overlay {
+        display: none; position: fixed; inset: 0;
+        background: rgba(0,0,0,.45); z-index: 998;
+        opacity: 0; transition: opacity .3s;
+    }
+    .nav-overlay.open { opacity: 1; }
+
+    .nav-drawer__header {
+        background: linear-gradient(135deg, #1a3d1e, #2c5530);
+        padding: 20px 24px; display: flex; align-items: center; gap: 12px;
+    }
+    .nav-drawer__header-icon {
+        width: 38px; height: 38px; border-radius: 8px;
+        background: rgba(212,175,55,.2); border: 1px solid rgba(212,175,55,.3);
+        display: flex; align-items: center; justify-content: center;
+        color: #d4af37; font-size: 1.1rem;
+    }
+    .nav-drawer__header-title { color: #fff; font-size: .95rem; font-weight: 700; line-height: 1.2; }
+    .nav-drawer__header-sub   { color: rgba(255,255,255,.5); font-size: .7rem; letter-spacing: 1px; }
+    .nav-drawer__close {
+        margin-left: auto; background: rgba(255,255,255,.1); border: none;
+        color: #fff; width: 32px; height: 32px; border-radius: 50%;
+        cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center;
+        transition: background .2s;
+    }
+    .nav-drawer__close:hover { background: rgba(255,255,255,.2); }
+
+    .nav-drawer__section-label {
+        padding: 16px 24px 6px;
+        font-size: .68rem; font-weight: 700; color: #aaa;
+        text-transform: uppercase; letter-spacing: 2px;
+    }
+    .nav-drawer__links { list-style: none; padding: 0; margin: 0; }
+    .nav-drawer__links li a,
+    .nav-drawer__links li button {
+        display: flex; align-items: center; gap: 14px;
+        padding: 13px 24px; text-decoration: none;
+        color: #333; font-size: .93rem; font-weight: 600;
+        border: none; background: none; width: 100%; text-align: left;
+        cursor: pointer; font-family: inherit; transition: all .15s;
+        border-bottom: 1px solid rgba(0,0,0,.05);
+    }
+    .nav-drawer__links li a i,
+    .nav-drawer__links li button i {
+        width: 20px; text-align: center; color: #2c5530; font-size: .9rem;
+    }
+    .nav-drawer__links li a:hover,
+    .nav-drawer__links li button:hover { background: #f5f3ee; color: #2c5530; padding-left: 30px; }
+    .nav-drawer__cta-group { padding: 20px 24px; display: flex; flex-direction: column; gap: 10px; }
+    .nav-drawer__join {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 13px; border-radius: 10px; font-weight: 700; font-size: .9rem;
+        background: linear-gradient(135deg, #2c5530, #1a3d1e); color: #fff !important;
+        text-decoration: none; transition: all .2s;
+    }
+    .nav-drawer__join:hover { opacity: .9; }
+    .nav-drawer__track {
+        display: flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 12px; border-radius: 10px; font-weight: 600; font-size: .88rem;
+        border: 1.5px solid rgba(44,85,48,.3); color: #2c5530;
+        text-decoration: none; transition: all .2s;
+    }
+    .nav-drawer__track:hover { background: rgba(44,85,48,.05); }
+    .nav-drawer__social {
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+        padding: 16px 24px 24px; border-top: 1px solid rgba(0,0,0,.07);
+    }
+    .nav-drawer__social a {
+        width: 36px; height: 36px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        background: #f0f0f0; color: #555; text-decoration: none;
+        font-size: .9rem; transition: all .2s;
+    }
+    .nav-drawer__social a:hover { background: #2c5530; color: #d4af37; }
+
+    /* ── Responsive ──────────────────────────────────────── */
+    @@media (max-width: 1080px) {
+        .nav-links > li > a { padding: 0 10px; font-size: .82rem; }
+        .nav-logo__name { font-size: .95rem; }
+        .nav-logo { margin-right: 20px; }
+    }
+    @@media (max-width: 900px) {
+        .nav-links, .nav-actions, .nav-divider { display: none; }
+        .hamburger { display: flex; }
+        .nav-drawer { display: flex; }
+        .nav-overlay { display: block; }
+        .nav-topbar__left { display: none; }
+    }
+    @@media (max-width: 480px) {
+        .nav-topbar { display: none; }
+        .nav-logo__text { display: none; }
+        .nav-logo { margin-right: 0; }
+    }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="logo">
-                    <i class="fas fa-mosque"></i>
-                    <div>
-                        <h1>Gambian Muslim Community</h1>
-                        <p>Minnesota</p>
-                    </div>
+        @* ── Top utility bar ── *@
+        <div class="nav-topbar">
+            <div class="nav-topbar__inner">
+                <div class="nav-topbar__left">
+                    <span><i class="fas fa-map-marker-alt"></i> Minneapolis, Minnesota</span>
+                    <span><i class="fas fa-phone"></i> (612) 555-0123</span>
+                    <span><i class="fas fa-clock"></i> Jummah every Friday · 1:00 PM</span>
                 </div>
-                <ul class="nav-menu" id="nav-menu">
-                    <li><a asp-action="Index" asp-controller="Home">Home</a></li>
-                    <li><a asp-action="About" asp-controller="Home">About</a></li>
-                    <li><a asp-action="Services" asp-controller="Home">Services</a></li>
-                    <li><a asp-action="Events" asp-controller="Home">Events</a></li>
-                    <li><a asp-action="MasjidProject" asp-controller="Home">Masjid Project</a></li>
-                    <li><a asp-action="PrayerTimes" asp-controller="Home">Prayer Times</a></li>
-                    <li><a asp-action="Contact" asp-controller="Home">Contact</a></li>
+                <div class="nav-topbar__right">
+                    <div class="nav-topbar__social">
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                    </div>
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <li><a asp-action="Dashboard" asp-controller="Admin"><i class="fas fa-tachometer-alt"></i> Admin</a></li>
-                        <li>
-                            <form asp-action="Logout" asp-controller="Admin" method="post" style="display: inline;">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="nav-logout-btn">
-                                    <i class="fas fa-sign-out-alt"></i> Logout
-                                </button>
-                            </form>
-                        </li>
+                        <a asp-action="Dashboard" asp-controller="Admin" class="nav-admin-pill nav-admin-pill--dashboard">
+                            <i class="fas fa-tachometer-alt"></i> Admin Panel
+                        </a>
+                        <form asp-action="Logout" asp-controller="Admin" method="post" style="display:inline;">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="nav-admin-pill nav-admin-pill--logout">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </form>
                     }
                     else
                     {
-                        <li><a asp-action="Login" asp-controller="Admin"><i class="fas fa-sign-in-alt"></i> Admin Login</a></li>
+                        <a asp-action="Login" asp-controller="Admin" class="nav-admin-pill nav-admin-pill--login">
+                            <i class="fas fa-lock"></i> Admin
+                        </a>
                     }
-                </ul>
-                <div class="hamburger" id="hamburger">
-                    <span></span>
-                    <span></span>
-                    <span></span>
                 </div>
+            </div>
+        </div>
+
+        @* ── Main navbar ── *@
+        <nav class="navbar" id="mainNav">
+            <div class="nav-container">
+                <a asp-action="Index" asp-controller="Home" class="nav-logo">
+                    <div class="nav-logo__icon"><i class="fas fa-mosque"></i></div>
+                    <div class="nav-logo__text">
+                        <span class="nav-logo__name">Gambian Muslim Community</span>
+                        <span class="nav-logo__sub">Minnesota</span>
+                    </div>
+                </a>
+
+                <ul class="nav-links" id="nav-menu">
+                    <li><a asp-action="Index"        asp-controller="Home">Home</a></li>
+                    <li><a asp-action="About"        asp-controller="Home">About</a></li>
+                    <li><a asp-action="Services"     asp-controller="Home">Services</a></li>
+                    <li><a asp-action="Events"       asp-controller="Home">Events</a></li>
+                    <li><a asp-action="MasjidProject" asp-controller="Home">Masjid Project</a></li>
+                    <li><a asp-action="PrayerTimes"  asp-controller="Home">Prayer Times</a></li>
+                    <li><a asp-action="Contact"      asp-controller="Home">Contact</a></li>
+                </ul>
+
+                <div class="nav-divider"></div>
+                <div class="nav-actions">
+                    <a asp-action="Lookup" asp-controller="Contribution" class="nav-track-btn">
+                        <i class="fas fa-chart-line"></i> Contributions
+                    </a>
+                    <a asp-action="Register" asp-controller="Membership" class="nav-join-btn">
+                        <i class="fas fa-user-plus"></i> Join Community
+                    </a>
+                </div>
+
+                <button class="hamburger" id="hamburger" aria-label="Open menu">
+                    <span></span><span></span><span></span>
+                </button>
             </div>
         </nav>
     </header>
+
+    @* ── Mobile overlay ── *@
+    <div class="nav-overlay" id="navOverlay"></div>
+
+    @* ── Mobile drawer ── *@
+    <div class="nav-drawer" id="navDrawer" role="dialog" aria-label="Navigation menu">
+        <div class="nav-drawer__header">
+            <div class="nav-drawer__header-icon"><i class="fas fa-mosque"></i></div>
+            <div>
+                <div class="nav-drawer__header-title">Gambian Muslim Community</div>
+                <div class="nav-drawer__header-sub">Minnesota</div>
+            </div>
+            <button class="nav-drawer__close" id="drawerClose" aria-label="Close menu">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="nav-drawer__section-label">Navigation</div>
+        <ul class="nav-drawer__links">
+            <li><a asp-action="Index"         asp-controller="Home"><i class="fas fa-home"></i> Home</a></li>
+            <li><a asp-action="About"         asp-controller="Home"><i class="fas fa-info-circle"></i> About</a></li>
+            <li><a asp-action="Services"      asp-controller="Home"><i class="fas fa-concierge-bell"></i> Services</a></li>
+            <li><a asp-action="Events"        asp-controller="Home"><i class="fas fa-calendar-alt"></i> Events</a></li>
+            <li><a asp-action="MasjidProject" asp-controller="Home"><i class="fas fa-mosque"></i> Masjid Project</a></li>
+            <li><a asp-action="PrayerTimes"   asp-controller="Home"><i class="fas fa-clock"></i> Prayer Times</a></li>
+            <li><a asp-action="Contact"       asp-controller="Home"><i class="fas fa-envelope"></i> Contact</a></li>
+        </ul>
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div class="nav-drawer__section-label">Admin</div>
+            <ul class="nav-drawer__links">
+                <li><a asp-action="Dashboard" asp-controller="Admin"><i class="fas fa-tachometer-alt"></i> Admin Panel</a></li>
+                <li>
+                    <form asp-action="Logout" asp-controller="Admin" method="post">
+                        @Html.AntiForgeryToken()
+                        <button type="submit"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    </form>
+                </li>
+            </ul>
+        }
+
+        <div class="nav-drawer__cta-group">
+            <a asp-action="Register" asp-controller="Membership" class="nav-drawer__join">
+                <i class="fas fa-user-plus"></i> Join Our Community
+            </a>
+            <a asp-action="Lookup" asp-controller="Contribution" class="nav-drawer__track">
+                <i class="fas fa-chart-line"></i> Track Contributions
+            </a>
+        </div>
+
+        <div class="nav-drawer__social">
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+            <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+    </div>
 
     <main role="main">
         @RenderBody()

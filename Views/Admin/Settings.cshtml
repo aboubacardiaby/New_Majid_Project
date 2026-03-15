@@ -68,6 +68,30 @@
                         </div>
                     </div>
 
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="SiteInfo.ImamTitle" class="form-label">Imam Title</label>
+                                <input asp-for="SiteInfo.ImamTitle" class="form-control" placeholder="e.g., Community Imam & Spiritual Leader" />
+                                <span asp-validation-for="SiteInfo.ImamTitle" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mb-3">
+                                <label asp-for="SiteInfo.ImamImageUrl" class="form-label">Imam Image URL</label>
+                                <input asp-for="SiteInfo.ImamImageUrl" class="form-control" placeholder="URL to the Imam's photo" />
+                                <span asp-validation-for="SiteInfo.ImamImageUrl" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="SiteInfo.ImamWelcomeMessage" class="form-label">Imam Welcome Message</label>
+                        <textarea asp-for="SiteInfo.ImamWelcomeMessage" class="form-control" rows="4" placeholder="Welcome message from the Imam to the community"></textarea>
+                        <span asp-validation-for="SiteInfo.ImamWelcomeMessage" class="text-danger"></span>
+                        <div class="form-text">This message will be displayed prominently on the homepage as a welcome message from the Imam.</div>
+                    </div>
+
                     <div class="form-group mb-3">
                         <label asp-for="SiteInfo.SiteDescription" class="form-label">Site Description</label>
                         <textarea asp-for="SiteInfo.SiteDescription" class="form-control" rows="3" placeholder="Brief description of your community"></textarea>

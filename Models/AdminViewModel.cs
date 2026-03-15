@@ -100,6 +100,15 @@ namespace GambianMuslimCommunity.Models
 
         [Display(Name = "Imam Name")]
         public string ImamName { get; set; } = string.Empty;
+
+        [Display(Name = "Imam Welcome Message")]
+        public string ImamWelcomeMessage { get; set; } = string.Empty;
+
+        [Display(Name = "Imam Image URL")]
+        public string ImamImageUrl { get; set; } = string.Empty;
+
+        [Display(Name = "Imam Title")]
+        public string ImamTitle { get; set; } = string.Empty;
     }
 
     public class EmailSettings

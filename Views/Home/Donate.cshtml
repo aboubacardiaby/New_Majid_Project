@@ -1,6 +1,13 @@
 @model MasjidDonation
+@inject Microsoft.Extensions.Configuration.IConfiguration Config
 @{
     ViewData["Title"] = "Donate to " + Model.MasjidProject?.Title;
+    var cashAppHandle = Config["QuickPay:CashAppHandle"] ?? "$GambianMuslimMN";
+    var venmoHandle   = Config["QuickPay:VenmoHandle"]   ?? "GambianMuslimMN";
+    var donationNote  = Config["QuickPay:DonationNote"]  ?? "Masjid Building Fund";
+
+    // URL-safe note
+    var noteEncoded = Uri.EscapeDataString(donationNote);
 }
 
 <section class="page-header">
@@ -12,14 +19,40 @@
 
 <section class="donation-form-section">
     <div class="container">
+
+        @* ── Quick Pay banner ──────────────────────────────────────────────── *@
+        <div class="qp-banner">
+            <div class="qp-banner__text">
+                <i class="fas fa-bolt"></i>
+                <div>
+                    <strong>Quick Pay — No form needed!</strong>
+                    <span>Send directly via CashApp or Venmo and we'll record your contribution.</span>
+                </div>
+            </div>
+            <div class="qp-banner__btns">
+                <a href="https://cash.app/@cashAppHandle" target="_blank" rel="noopener" class="qp-btn qp-btn--cash">
+                    <svg class="qp-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9.34 4.098l.54 1.548c-2.254.77-3.692 2.422-3.692 4.342 0 2.026 1.632 3.52 4.83 4.24l1.312.298c2.14.48 2.98 1.08 2.98 2.16 0 1.22-1.22 2.06-3.08 2.06-1.78 0-3.34-.72-4.42-2.08l-1.5 1.38c1.36 1.68 3.36 2.68 5.52 2.78l.28 1.7h1.86l-.28-1.74c2.6-.28 4.48-1.9 4.48-4.14 0-2.18-1.52-3.5-4.74-4.24l-1.32-.3c-2.08-.48-3.02-1.08-3.02-2.06 0-1.12 1.1-1.9 2.82-1.9 1.46 0 2.8.58 3.76 1.62l1.44-1.44c-1.18-1.2-2.82-1.96-4.68-2.1l-.28-1.66H9.62l.28 1.58z"/></svg>
+                    Pay with CashApp
+                    <span class="qp-handle">@cashAppHandle</span>
+                </a>
+                <a href="https://venmo.com/@venmoHandle" target="_blank" rel="noopener" class="qp-btn qp-btn--venmo">
+                    <svg class="qp-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.1 2c.4 1.2.6 2.4.6 3.9 0 4.3-3.7 9.9-6.7 13.8H6.7L4 2.6l5.8-.6 1.4 11.1C12.5 10.8 14 7.1 14 4.5c0-1-.2-1.9-.5-2.6L19.1 2z"/></svg>
+                    Pay with Venmo
+                    <span class="qp-handle">@@@venmoHandle</span>
+                </a>
+            </div>
+        </div>
+
         <div class="donation-grid">
+
+            @* ── Left: form ─────────────────────────────────────────────────── *@
             <div class="donation-form-card">
                 <div class="form-header">
                     <h2>Your Donation Details</h2>
                     <p>May Allah (SWT) reward you for your generous contribution</p>
                 </div>
 
-                <form asp-action="Donate" method="post" class="donation-form">
+                <form asp-action="Donate" method="post" class="donation-form" id="donationForm">
                     @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="MasjidProjectId" />
 
@@ -31,10 +64,12 @@
                         </div>
                     }
 
+                    @* Amount *@
                     <div class="form-section">
                         <h3><i class="fas fa-dollar-sign"></i> Donation Amount</h3>
                         <div class="amount-selection">
                             <div class="preset-amounts">
+                                <button type="button" class="amount-btn" data-amount="25">$25</button>
                                 <button type="button" class="amount-btn" data-amount="50">$50</button>
                                 <button type="button" class="amount-btn" data-amount="100">$100</button>
                                 <button type="button" class="amount-btn" data-amount="250">$250</button>
@@ -45,13 +80,14 @@
                                 <label asp-for="Amount">Custom Amount *</label>
                                 <div class="amount-input">
                                     <span class="currency">$</span>
-                                    <input asp-for="Amount" type="number" step="0.01" min="1" placeholder="0.00" class="form-control" />
+                                    <input asp-for="Amount" type="number" step="0.01" min="1" placeholder="0.00" class="form-control" id="amountInput" />
                                 </div>
                                 <span asp-validation-for="Amount" class="text-danger"></span>
                             </div>
                         </div>
                     </div>
 
+                    @* Donor info *@
                     <div class="form-section">
                         <h3><i class="fas fa-user"></i> Donor Information</h3>
                         <div class="form-row">
@@ -66,90 +102,252 @@
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
                         </div>
-
                         <div class="form-group">
-                            <label asp-for="Message">Message/Note (Optional)</label>
-                            <textarea asp-for="Message" rows="3" class="form-control" placeholder="Share why you're supporting this project..."></textarea>
-                            <span asp-validation-for="Message" class="text-danger"></span>
+                            <label asp-for="Message">Message / Note (Optional)</label>
+                            <textarea asp-for="Message" rows="3" class="form-control" placeholder="Share why you're supporting this project…"></textarea>
                         </div>
-
                         <div class="form-group">
                             <div class="checkbox-group">
                                 <input asp-for="IsAnonymous" type="checkbox" class="form-check-input" />
-                                <label asp-for="IsAnonymous" class="form-check-label">
-                                    Make this an anonymous donation
-                                </label>
+                                <label asp-for="IsAnonymous" class="form-check-label">Make this an anonymous donation</label>
                             </div>
                             <small class="form-text">If checked, your name will not be displayed publicly</small>
                         </div>
                     </div>
 
+                    @* Payment method *@
                     <div class="form-section">
                         <h3><i class="fas fa-credit-card"></i> Payment Method</h3>
                         <div class="payment-methods">
+
+                            @* PayPal *@
                             <div class="payment-option">
-                                <input type="radio" name="PaymentMethod" value="PayPal" id="paypal" checked />
-                                <label for="paypal">
-                                    <i class="fab fa-paypal"></i>
-                                    PayPal - Secure Online Payment
+                                <input type="radio" name="PaymentMethod" value="PayPal" id="pm-paypal" checked />
+                                <label for="pm-paypal" class="pm-label pm-label--paypal">
+                                    <i class="fab fa-paypal pm-icon"></i>
+                                    <div class="pm-info">
+                                        <strong>PayPal</strong>
+                                        <span>Secure online payment</span>
+                                    </div>
+                                    <div class="pm-check"><i class="fas fa-check-circle"></i></div>
                                 </label>
                             </div>
+
+                            @* CashApp *@
                             <div class="payment-option">
-                                <input type="radio" name="PaymentMethod" value="Credit Card" id="credit-card" />
-                                <label for="credit-card">
-                                    <i class="fas fa-credit-card"></i>
-                                    Credit/Debit Card (Coming Soon)
+                                <input type="radio" name="PaymentMethod" value="CashApp" id="pm-cashapp" />
+                                <label for="pm-cashapp" class="pm-label pm-label--cashapp">
+                                    <svg class="pm-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M9.34 4.098l.54 1.548c-2.254.77-3.692 2.422-3.692 4.342 0 2.026 1.632 3.52 4.83 4.24l1.312.298c2.14.48 2.98 1.08 2.98 2.16 0 1.22-1.22 2.06-3.08 2.06-1.78 0-3.34-.72-4.42-2.08l-1.5 1.38c1.36 1.68 3.36 2.68 5.52 2.78l.28 1.7h1.86l-.28-1.74c2.6-.28 4.48-1.9 4.48-4.14 0-2.18-1.52-3.5-4.74-4.24l-1.32-.3c-2.08-.48-3.02-1.08-3.02-2.06 0-1.12 1.1-1.9 2.82-1.9 1.46 0 2.8.58 3.76 1.62l1.44-1.44c-1.18-1.2-2.82-1.96-4.68-2.1l-.28-1.66H9.62l.28 1.58z"/></svg>
+                                    <div class="pm-info">
+                                        <strong>Cash App</strong>
+                                        <span>@cashAppHandle · Instant transfer</span>
+                                    </div>
+                                    <div class="pm-check"><i class="fas fa-check-circle"></i></div>
                                 </label>
                             </div>
+
+                            @* Venmo *@
                             <div class="payment-option">
-                                <input type="radio" name="PaymentMethod" value="Bank Transfer" id="bank-transfer" />
-                                <label for="bank-transfer">
-                                    <i class="fas fa-university"></i>
-                                    Bank Transfer (Coming Soon)
+                                <input type="radio" name="PaymentMethod" value="Venmo" id="pm-venmo" />
+                                <label for="pm-venmo" class="pm-label pm-label--venmo">
+                                    <svg class="pm-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.1 2c.4 1.2.6 2.4.6 3.9 0 4.3-3.7 9.9-6.7 13.8H6.7L4 2.6l5.8-.6 1.4 11.1C12.5 10.8 14 7.1 14 4.5c0-1-.2-1.9-.5-2.6L19.1 2z"/></svg>
+                                    <div class="pm-info">
+                                        <strong>Venmo</strong>
+                                        <span>@@@venmoHandle · Social payments</span>
+                                    </div>
+                                    <div class="pm-check"><i class="fas fa-check-circle"></i></div>
                                 </label>
                             </div>
+
+                            @* Credit Card (coming soon) *@
+                            <div class="payment-option pm-disabled">
+                                <input type="radio" name="PaymentMethod" value="Credit Card" id="pm-card" disabled />
+                                <label for="pm-card" class="pm-label">
+                                    <i class="fas fa-credit-card pm-icon"></i>
+                                    <div class="pm-info">
+                                        <strong>Credit / Debit Card</strong>
+                                        <span>Coming soon</span>
+                                    </div>
+                                    <span class="pm-soon">Soon</span>
+                                </label>
+                            </div>
+
+                            @* Cash *@
                             <div class="payment-option">
-                                <input type="radio" name="PaymentMethod" value="Cash" id="cash" />
-                                <label for="cash">
-                                    <i class="fas fa-money-bill-alt"></i>
-                                    Cash (In-Person)
+                                <input type="radio" name="PaymentMethod" value="Cash" id="pm-cash" />
+                                <label for="pm-cash" class="pm-label">
+                                    <i class="fas fa-money-bill-wave pm-icon"></i>
+                                    <div class="pm-info">
+                                        <strong>Cash</strong>
+                                        <span>In-person at the masjid</span>
+                                    </div>
+                                    <div class="pm-check"><i class="fas fa-check-circle"></i></div>
                                 </label>
                             </div>
                         </div>
-                        
-                        <div class="paypal-info">
-                            <div class="paypal-benefits">
-                                <h4><i class="fab fa-paypal"></i> Why PayPal?</h4>
-                                <ul>
-                                    <li><i class="fas fa-shield-alt"></i> Bank-level security and encryption</li>
-                                    <li><i class="fas fa-credit-card"></i> Pay with PayPal balance, bank, or card</li>
+
+                        @* ── PayPal info panel ── *@
+                        <div class="pm-panel pm-panel--paypal active" id="panel-paypal">
+                            <div class="pm-panel__icon" style="color:#0070ba"><i class="fab fa-paypal"></i></div>
+                            <div>
+                                <h4>Why PayPal?</h4>
+                                <ul class="pm-benefits">
+                                    <li><i class="fas fa-shield-alt"></i> Bank-level security</li>
+                                    <li><i class="fas fa-credit-card"></i> Pay with card or PayPal balance</li>
                                     <li><i class="fas fa-mobile-alt"></i> Mobile-friendly checkout</li>
                                     <li><i class="fas fa-undo"></i> Buyer protection included</li>
                                 </ul>
                             </div>
                         </div>
+
+                        @* ── CashApp panel ── *@
+                        <div class="pm-panel pm-panel--cashapp" id="panel-cashapp">
+                            <div class="pm-panel__steps">
+                                <div class="pm-step">
+                                    <div class="pm-step__num">1</div>
+                                    <p>Enter your amount above, then click <strong>Open Cash App</strong></p>
+                                </div>
+                                <div class="pm-step">
+                                    <div class="pm-step__num">2</div>
+                                    <p>Complete the payment to <strong>@cashAppHandle</strong> — include the note below</p>
+                                </div>
+                                <div class="pm-step">
+                                    <div class="pm-step__num">3</div>
+                                    <p>Return here and click <strong>"I've Paid"</strong> to record your contribution</p>
+                                </div>
+                            </div>
+                            <div class="pm-note-copy">
+                                <span class="pm-note-label">Use this note:</span>
+                                <code id="cashapp-note">@donationNote</code>
+                                <button type="button" class="pm-copy-btn" onclick="copyNote('cashapp-note')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <a id="cashapp-link"
+                               href="https://cash.app/@cashAppHandle"
+                               target="_blank" rel="noopener"
+                               class="pm-pay-btn pm-pay-btn--cashapp">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M9.34 4.098l.54 1.548c-2.254.77-3.692 2.422-3.692 4.342 0 2.026 1.632 3.52 4.83 4.24l1.312.298c2.14.48 2.98 1.08 2.98 2.16 0 1.22-1.22 2.06-3.08 2.06-1.78 0-3.34-.72-4.42-2.08l-1.5 1.38c1.36 1.68 3.36 2.68 5.52 2.78l.28 1.7h1.86l-.28-1.74c2.6-.28 4.48-1.9 4.48-4.14 0-2.18-1.52-3.5-4.74-4.24l-1.32-.3c-2.08-.48-3.02-1.08-3.02-2.06 0-1.12 1.1-1.9 2.82-1.9 1.46 0 2.8.58 3.76 1.62l1.44-1.44c-1.18-1.2-2.82-1.96-4.68-2.1l-.28-1.66H9.62l.28 1.58z"/></svg>
+                                Open Cash App · <span id="cashapp-amount-label">Enter amount above</span>
+                            </a>
+                        </div>
+
+                        @* ── Venmo panel ── *@
+                        <div class="pm-panel pm-panel--venmo" id="panel-venmo">
+                            <div class="pm-panel__steps">
+                                <div class="pm-step">
+                                    <div class="pm-step__num">1</div>
+                                    <p>Enter your amount above, then click <strong>Open Venmo</strong></p>
+                                </div>
+                                <div class="pm-step">
+                                    <div class="pm-step__num">2</div>
+                                    <p>Complete the payment to <strong>@@@venmoHandle</strong> — include the note below</p>
+                                </div>
+                                <div class="pm-step">
+                                    <div class="pm-step__num">3</div>
+                                    <p>Return here and click <strong>"I've Paid"</strong> to record your contribution</p>
+                                </div>
+                            </div>
+                            <div class="pm-note-copy">
+                                <span class="pm-note-label">Use this note:</span>
+                                <code id="venmo-note">@donationNote</code>
+                                <button type="button" class="pm-copy-btn" onclick="copyNote('venmo-note')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
+                            <a id="venmo-link"
+                               href="https://account.venmo.com/pay?recipients=@venmoHandle&note=@noteEncoded"
+                               target="_blank" rel="noopener"
+                               class="pm-pay-btn pm-pay-btn--venmo">
+                                <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20"><path d="M19.1 2c.4 1.2.6 2.4.6 3.9 0 4.3-3.7 9.9-6.7 13.8H6.7L4 2.6l5.8-.6 1.4 11.1C12.5 10.8 14 7.1 14 4.5c0-1-.2-1.9-.5-2.6L19.1 2z"/></svg>
+                                Open Venmo · <span id="venmo-amount-label">Enter amount above</span>
+                            </a>
+                        </div>
+
+                        @* ── Cash panel ── *@
+                        <div class="pm-panel pm-panel--cash" id="panel-cash">
+                            <div class="pm-panel__icon" style="color:#28a745"><i class="fas fa-mosque"></i></div>
+                            <div>
+                                <h4>In-Person Cash Donation</h4>
+                                <p style="color:#555;margin-top:6px;line-height:1.6">
+                                    You can drop off your cash donation at the masjid during any prayer time.
+                                    Please speak to the imam or any community officer. JazakAllahu Khayran!
+                                </p>
+                            </div>
+                        </div>
                     </div>
 
+                    @* Form actions *@
                     <div class="form-actions">
+                        @* PayPal button *@
                         <button type="button" id="paypal-donate-btn" class="btn btn-paypal btn-lg btn-block">
                             <i class="fab fa-paypal"></i> Donate with PayPal
                         </button>
-                        <button type="submit" id="regular-donate-btn" class="btn btn-primary btn-lg btn-block" style="display: none;">
+                        @* CashApp / Venmo "I've Paid" button *@
+                        <button type="submit" id="paid-btn" class="btn btn-success-solid btn-lg btn-block" style="display:none;">
+                            <i class="fas fa-check-circle"></i> I've Paid — Record My Contribution
+                        </button>
+                        @* Cash submit *@
+                        <button type="submit" id="regular-donate-btn" class="btn btn-primary btn-lg btn-block" style="display:none;">
                             <i class="fas fa-heart"></i> Complete Donation
                         </button>
                         <a asp-action="MasjidProject" asp-route-id="@Model.MasjidProjectId" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Back to Project
+                            <i class="fas fa-arrow-left"></i> Back
                         </a>
                     </div>
                 </form>
             </div>
 
+            @* ── Right sidebar ───────────────────────────────────────────────── *@
             <div class="donation-summary">
+
+                @* Quick Pay widget *@
+                <div class="qp-widget">
+                    <div class="qp-widget__header">
+                        <i class="fas fa-bolt"></i> Quick Pay
+                    </div>
+                    <p class="qp-widget__sub">Tap below — no form required. Just send and let us know!</p>
+
+                    <div class="qp-widget__amount-row">
+                        <span>Choose amount:</span>
+                        <div class="qp-amounts">
+                            <button type="button" class="qp-amt" data-val="25">$25</button>
+                            <button type="button" class="qp-amt" data-val="50">$50</button>
+                            <button type="button" class="qp-amt" data-val="100">$100</button>
+                            <button type="button" class="qp-amt active" data-val="">Other</button>
+                        </div>
+                    </div>
+
+                    <a id="qp-cashapp" href="https://cash.app/@cashAppHandle" target="_blank" rel="noopener" class="qp-widget__btn qp-widget__btn--cash">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M9.34 4.098l.54 1.548c-2.254.77-3.692 2.422-3.692 4.342 0 2.026 1.632 3.52 4.83 4.24l1.312.298c2.14.48 2.98 1.08 2.98 2.16 0 1.22-1.22 2.06-3.08 2.06-1.78 0-3.34-.72-4.42-2.08l-1.5 1.38c1.36 1.68 3.36 2.68 5.52 2.78l.28 1.7h1.86l-.28-1.74c2.6-.28 4.48-1.9 4.48-4.14 0-2.18-1.52-3.5-4.74-4.24l-1.32-.3c-2.08-.48-3.02-1.08-3.02-2.06 0-1.12 1.1-1.9 2.82-1.9 1.46 0 2.8.58 3.76 1.62l1.44-1.44c-1.18-1.2-2.82-1.96-4.68-2.1l-.28-1.66H9.62l.28 1.58z"/></svg>
+                        <div>
+                            <strong>Pay with Cash App</strong>
+                            <span>@cashAppHandle</span>
+                        </div>
+                        <i class="fas fa-external-link-alt qp-ext"></i>
+                    </a>
+
+                    <a id="qp-venmo" href="https://account.venmo.com/pay?recipients=@venmoHandle&note=@noteEncoded" target="_blank" rel="noopener" class="qp-widget__btn qp-widget__btn--venmo">
+                        <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22"><path d="M19.1 2c.4 1.2.6 2.4.6 3.9 0 4.3-3.7 9.9-6.7 13.8H6.7L4 2.6l5.8-.6 1.4 11.1C12.5 10.8 14 7.1 14 4.5c0-1-.2-1.9-.5-2.6L19.1 2z"/></svg>
+                        <div>
+                            <strong>Pay with Venmo</strong>
+                            <span>@@@venmoHandle</span>
+                        </div>
+                        <i class="fas fa-external-link-alt qp-ext"></i>
+                    </a>
+
+                    <p class="qp-widget__note">
+                        <i class="fas fa-info-circle"></i>
+                        Include note: <strong>@donationNote</strong>
+                    </p>
+                </div>
+
+                @* Project summary *@
                 <div class="project-summary">
                     <h3>@Model.MasjidProject?.Title</h3>
                     <div class="project-progress">
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: @Model.MasjidProject?.ProgressPercentage%"></div>
+                            <div class="progress-fill" style="width:@Model.MasjidProject?.ProgressPercentage%"></div>
                         </div>
                         <div class="progress-stats">
                             <span>${@Model.MasjidProject?.CurrentAmount:N0} raised</span>
@@ -158,38 +356,30 @@
                     </div>
                 </div>
 
+                @* Impact *@
                 <div class="donation-impact">
                     <h4>Your Impact</h4>
                     <div class="impact-examples">
-                        <div class="impact-example">
-                            <span class="amount">$50</span>
-                            <span class="description">Sponsor prayer rugs</span>
-                        </div>
-                        <div class="impact-example">
-                            <span class="amount">$100</span>
-                            <span class="description">Support classroom equipment</span>
-                        </div>
-                        <div class="impact-example">
-                            <span class="amount">$250</span>
-                            <span class="description">Contribute to sound system</span>
-                        </div>
-                        <div class="impact-example">
-                            <span class="amount">$500</span>
-                            <span class="description">Help with materials</span>
-                        </div>
+                        <div class="impact-example"><span class="amount">$25</span><span class="description">Prayer mats</span></div>
+                        <div class="impact-example"><span class="amount">$50</span><span class="description">Sponsor prayer rugs</span></div>
+                        <div class="impact-example"><span class="amount">$100</span><span class="description">Classroom equipment</span></div>
+                        <div class="impact-example"><span class="amount">$250</span><span class="description">Sound system</span></div>
+                        <div class="impact-example"><span class="amount">$500</span><span class="description">Construction materials</span></div>
                     </div>
                 </div>
 
+                @* Hadith *@
                 <div class="islamic-reminder">
                     <div class="reminder-content">
                         <i class="fas fa-quote-left"></i>
                         <p>"The believer's shade on the Day of Resurrection will be his charity."</p>
-                        <cite>- Prophet Muhammad (PBUH)</cite>
+                        <cite>— Prophet Muhammad ﷺ</cite>
                     </div>
                 </div>
 
+                @* Security *@
                 <div class="security-info">
-                    <h4><i class="fas fa-shield-alt"></i> Secure Donation</h4>
+                    <h4><i class="fas fa-shield-alt"></i> Safe & Transparent</h4>
                     <ul>
                         <li><i class="fas fa-check"></i> SSL encrypted connection</li>
                         <li><i class="fas fa-check"></i> Your data is protected</li>
@@ -204,269 +394,343 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const amountButtons = document.querySelectorAll('.amount-btn');
-            const amountInput = document.querySelector('input[name="Amount"]');
-            const paymentMethodRadios = document.querySelectorAll('input[name="PaymentMethod"]');
-            const paypalButton = document.getElementById('paypal-donate-btn');
-            const regularButton = document.getElementById('regular-donate-btn');
 
-            // Amount selection functionality
-            amountButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    amountButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                    const amount = this.dataset.amount;
-                    amountInput.value = amount;
-                });
-            });
-
-            // Clear active buttons when custom amount is entered
-            amountInput.addEventListener('input', function() {
-                amountButtons.forEach(btn => btn.classList.remove('active'));
-            });
-
-            // Payment method selection
-            paymentMethodRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    if (this.value === 'PayPal') {
-                        paypalButton.style.display = 'block';
-                        regularButton.style.display = 'none';
-                    } else {
-                        paypalButton.style.display = 'none';
-                        regularButton.style.display = 'block';
-                    }
-                });
-            });
-
-            // PayPal payment handling
-            paypalButton.addEventListener('click', function() {
-                const form = document.querySelector('.donation-form');
-                const formData = new FormData(form);
-                
-                // Validate required fields
-                const amount = formData.get('Amount');
-                const donorName = formData.get('DonorName');
-                
-                if (!amount || amount <= 0) {
-                    alert('Please enter a valid donation amount.');
-                    return;
-                }
-                
-                if (!donorName) {
-                    alert('Please enter your full name.');
-                    return;
-                }
-
-                // Disable button and show loading
-                paypalButton.disabled = true;
-                paypalButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-
-                // Prepare payment data
-                const paymentData = {
-                    MasjidProjectId: parseInt(formData.get('MasjidProjectId')),
-                    Amount: parseFloat(amount),
-                    DonorName: donorName,
-                    Email: formData.get('Email') || '',
-                    Message: formData.get('Message') || '',
-                    IsAnonymous: formData.get('IsAnonymous') === 'true'
-                };
-
-                // Create PayPal payment
-                fetch('/Home/CreatePayPalPayment', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                    },
-                    body: JSON.stringify(paymentData)
-                })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success && result.approvalUrl) {
-                        // Redirect to PayPal
-                        window.location.href = result.approvalUrl;
-                    } else {
-                        alert('Error creating PayPal payment: ' + (result.message || 'Unknown error'));
-                        resetPayPalButton();
-                    }
-                })
-                .catch(error => {
-                    console.error('PayPal payment error:', error);
-                    alert('Error processing PayPal payment. Please try again.');
-                    resetPayPalButton();
-                });
-            });
-
-            function resetPayPalButton() {
-                paypalButton.disabled = false;
-                paypalButton.innerHTML = '<i class="fab fa-paypal"></i> Donate with PayPal';
-            }
-        });
-    </script>
-    
     <style>
-        .btn-paypal {
-            background: linear-gradient(135deg, #0070ba, #005ea6);
-            color: white;
-            border: none;
-            font-weight: 600;
-            text-transform: none;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
+    /* ── Quick Pay banner ───────────────────────────────────────────────── */
+    .qp-banner {
+        display: flex; align-items: center; justify-content: space-between;
+        flex-wrap: wrap; gap: 16px;
+        background: linear-gradient(135deg, #1a3d1e, #2c5530);
+        border-radius: 14px; padding: 20px 28px; margin: 24px 0;
+        color: #fff;
+    }
+    .qp-banner__text {
+        display: flex; align-items: center; gap: 14px;
+    }
+    .qp-banner__text i { font-size: 1.6rem; color: #d4af37; }
+    .qp-banner__text strong { display: block; font-size: 1rem; margin-bottom: 2px; }
+    .qp-banner__text span  { font-size: .85rem; opacity: .75; }
+    .qp-banner__btns { display: flex; gap: 10px; flex-wrap: wrap; }
+    .qp-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 20px; border-radius: 10px; font-weight: 700; font-size: .88rem;
+        text-decoration: none; transition: all .2s; white-space: nowrap;
+    }
+    .qp-btn--cash  { background: #00d632; color: #000; }
+    .qp-btn--venmo { background: #3d95ce; color: #fff; }
+    .qp-btn:hover  { transform: translateY(-2px); opacity: .92; }
+    .qp-icon { width: 18px; height: 18px; }
+    .qp-handle { background: rgba(0,0,0,.15); padding: 2px 8px; border-radius: 8px; font-size: .78rem; margin-left: 4px; }
 
-        .btn-paypal:hover {
-            background: linear-gradient(135deg, #005ea6, #004c87);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0, 112, 186, 0.4);
-            color: white;
-        }
+    /* ── Payment method cards ───────────────────────────────────────────── */
+    .payment-methods { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .payment-option { position: relative; }
+    .payment-option input[type="radio"] { position: absolute; opacity: 0; width: 0; height: 0; }
+    .pm-label {
+        display: flex; align-items: center; gap: 14px;
+        padding: 14px 18px; border: 2px solid #e0e0e0; border-radius: 12px;
+        cursor: pointer; transition: all .2s; background: #fff;
+    }
+    .pm-label:hover { border-color: #2c5530; background: #f5faf5; }
+    .payment-option input[type="radio"]:checked + .pm-label {
+        border-color: #2c5530; background: linear-gradient(135deg, #f5faf5, #eef5ee);
+        box-shadow: 0 3px 12px rgba(44,85,48,.12);
+    }
+    .pm-label--paypal input:checked + & { border-color: #0070ba; }
+    .payment-option input#pm-paypal:checked + .pm-label { border-color: #0070ba; background: linear-gradient(135deg,#f8f9ff,#e8f2ff); }
+    .payment-option input#pm-cashapp:checked + .pm-label { border-color: #00d632; background: linear-gradient(135deg,#f0fff4,#e0ffe8); }
+    .payment-option input#pm-venmo:checked   + .pm-label { border-color: #3d95ce; background: linear-gradient(135deg,#f0f8ff,#e0f0ff); }
+    .pm-icon { width: 28px; height: 28px; font-size: 1.4rem; flex-shrink: 0; }
+    .pm-info { flex: 1; }
+    .pm-info strong { display: block; font-size: .93rem; }
+    .pm-info span   { font-size: .78rem; color: #888; }
+    .pm-check { color: #ccc; font-size: 1.1rem; transition: color .2s; }
+    .payment-option input[type="radio"]:checked + .pm-label .pm-check { color: #2c5530; }
+    .payment-option input#pm-paypal:checked  + .pm-label .pm-check { color: #0070ba; }
+    .payment-option input#pm-cashapp:checked + .pm-label .pm-check { color: #00d632; }
+    .payment-option input#pm-venmo:checked   + .pm-label .pm-check { color: #3d95ce; }
+    .pm-disabled .pm-label { opacity: .5; cursor: not-allowed; }
+    .pm-soon {
+        font-size: .68rem; font-weight: 700; text-transform: uppercase;
+        background: #f0f0f0; color: #999; padding: 2px 8px; border-radius: 8px;
+    }
 
-        .btn-paypal:active {
-            transform: translateY(0);
-        }
+    /* ── Payment panels ─────────────────────────────────────────────────── */
+    .pm-panel {
+        display: none; border-radius: 12px; padding: 20px;
+        margin-top: 4px; margin-bottom: 8px;
+    }
+    .pm-panel.active { display: flex; gap: 16px; align-items: flex-start; }
+    .pm-panel--paypal { background: linear-gradient(135deg,#f8f9ff,#e8f2ff); border: 1px solid rgba(0,112,186,.2); }
+    .pm-panel--cashapp { background: linear-gradient(135deg,#f0fff4,#d6ffdf); border: 1px solid rgba(0,214,50,.25); flex-direction: column !important; }
+    .pm-panel--venmo   { background: linear-gradient(135deg,#f0f8ff,#d6eeff); border: 1px solid rgba(61,149,206,.25); flex-direction: column !important; }
+    .pm-panel--cash    { background: #f8fff8; border: 1px solid rgba(40,167,69,.2); }
+    .pm-panel__icon { font-size: 2rem; }
+    .pm-panel h4 { font-size: 1rem; margin-bottom: 8px; }
+    .pm-benefits { list-style: none; padding: 0; margin: 0; }
+    .pm-benefits li { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: .88rem; color: #444; }
+    .pm-benefits li i { color: #0070ba; width: 16px; }
 
-        .btn-paypal:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
+    /* Steps */
+    .pm-panel__steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+    .pm-step { display: flex; align-items: flex-start; gap: 12px; font-size: .88rem; }
+    .pm-step__num {
+        flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+        background: #1a3d1e; color: #d4af37;
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: .8rem;
+    }
+    .pm-step p { margin: 2px 0 0; line-height: 1.5; }
 
-        .payment-methods {
-            display: grid;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
+    /* Note copy row */
+    .pm-note-copy {
+        display: flex; align-items: center; gap: 10px;
+        background: rgba(0,0,0,.05); border-radius: 8px; padding: 10px 14px;
+        margin-bottom: 14px; flex-wrap: wrap;
+    }
+    .pm-note-label { font-size: .78rem; color: #666; }
+    .pm-note-copy code {
+        flex: 1; font-size: .88rem; font-family: monospace;
+        color: #1a3d1e; font-weight: 700;
+    }
+    .pm-copy-btn {
+        background: none; border: 1px solid #ccc; border-radius: 6px;
+        padding: 4px 10px; cursor: pointer; color: #555; font-size: .8rem;
+        transition: all .2s;
+    }
+    .pm-copy-btn:hover { background: #1a3d1e; color: #d4af37; border-color: #1a3d1e; }
 
-        .payment-option {
-            position: relative;
-        }
+    /* Pay buttons */
+    .pm-pay-btn {
+        display: flex; align-items: center; justify-content: center; gap: 10px;
+        padding: 14px; border-radius: 10px; font-weight: 700; font-size: .95rem;
+        text-decoration: none; transition: all .25s; text-align: center;
+    }
+    .pm-pay-btn--cashapp { background: #00d632; color: #000; }
+    .pm-pay-btn--cashapp:hover { background: #00b829; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,214,50,.35); color: #000; }
+    .pm-pay-btn--venmo   { background: #3d95ce; color: #fff; }
+    .pm-pay-btn--venmo:hover   { background: #2e7eb5; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(61,149,206,.35); color: #fff; }
 
-        .payment-option input[type="radio"] {
-            position: absolute;
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+    /* Action buttons */
+    .btn-paypal {
+        background: linear-gradient(135deg,#0070ba,#005ea6); color: #fff;
+        border: none; font-weight: 600; transition: all .3s;
+    }
+    .btn-paypal:hover { background: linear-gradient(135deg,#005ea6,#004c87); transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,112,186,.4); color: #fff; }
+    .btn-paypal:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-success-solid {
+        background: linear-gradient(135deg,#28a745,#1e7e34); color: #fff;
+        border: none; font-weight: 700; transition: all .3s;
+    }
+    .btn-success-solid:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(40,167,69,.35); color: #fff; }
 
-        .payment-option label {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: white;
-            font-weight: 500;
-        }
+    .form-actions { display: flex; flex-direction: column; gap: 12px; margin-top: 28px; }
+    .btn-block { display: block; width: 100%; text-align: center; }
 
-        .payment-option label:hover {
-            border-color: #0070ba;
-            background: #f8f9ff;
-        }
+    /* ── Quick Pay widget ───────────────────────────────────────────────── */
+    .qp-widget {
+        background: #fff; border-radius: 14px; overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,.1); margin-bottom: 24px;
+    }
+    .qp-widget__header {
+        background: linear-gradient(135deg,#1a3d1e,#2c5530);
+        color: #d4af37; font-weight: 700; font-size: 1rem;
+        padding: 14px 20px; display: flex; align-items: center; gap: 8px;
+    }
+    .qp-widget__sub { color: #666; font-size: .82rem; padding: 12px 20px 0; line-height: 1.5; }
+    .qp-widget__amount-row { display: flex; align-items: center; gap: 10px; padding: 12px 20px; flex-wrap: wrap; }
+    .qp-widget__amount-row > span { font-size: .8rem; color: #888; }
+    .qp-amounts { display: flex; gap: 6px; flex-wrap: wrap; }
+    .qp-amt {
+        padding: 4px 12px; border-radius: 16px; border: 1.5px solid #e0e0e0;
+        font-size: .8rem; font-weight: 600; cursor: pointer; background: #fff;
+        color: #555; transition: all .2s;
+    }
+    .qp-amt.active, .qp-amt:hover { background: #1a3d1e; color: #d4af37; border-color: #1a3d1e; }
+    .qp-widget__btn {
+        display: flex; align-items: center; gap: 12px;
+        padding: 14px 20px; text-decoration: none; transition: all .2s;
+        border-bottom: 1px solid rgba(0,0,0,.06);
+    }
+    .qp-widget__btn strong { display: block; font-size: .9rem; }
+    .qp-widget__btn span   { font-size: .78rem; opacity: .75; }
+    .qp-widget__btn--cash  { color: #000; background: #f0fff4; }
+    .qp-widget__btn--cash:hover  { background: #e0ffe8; }
+    .qp-widget__btn--venmo { color: #1a1a2e; background: #f0f8ff; }
+    .qp-widget__btn--venmo:hover { background: #e0f0ff; }
+    .qp-ext { margin-left: auto; color: #aaa; font-size: .75rem; }
+    .qp-widget__note {
+        padding: 10px 20px 14px; font-size: .78rem; color: #888;
+        border-top: 1px solid rgba(0,0,0,.06);
+    }
+    .qp-widget__note strong { color: #1a3d1e; }
+    .qp-widget__note i { color: #d4af37; margin-right: 4px; }
 
-        .payment-option input[type="radio"]:checked + label {
-            border-color: #0070ba;
-            background: linear-gradient(135deg, #f8f9ff, #e8f2ff);
-            color: #0070ba;
-            box-shadow: 0 4px 12px rgba(0, 112, 186, 0.1);
-        }
-
-        .payment-option label i {
-            font-size: 1.5em;
-            margin-right: 12px;
-            min-width: 30px;
-        }
-
-        .payment-option input[type="radio"]:checked + label i {
-            color: #0070ba;
-        }
-
-        .paypal-info {
-            background: linear-gradient(135deg, #f8f9ff, #e8f2ff);
-            border: 1px solid #0070ba;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .paypal-benefits h4 {
-            color: #0070ba;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .paypal-benefits ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .paypal-benefits li {
-            display: flex;
-            align-items: center;
-            padding: 8px 0;
-            color: #333;
-        }
-
-        .paypal-benefits li i {
-            color: #0070ba;
-            margin-right: 12px;
-            min-width: 20px;
-        }
-
-        .form-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        @@media (min-width: 768px) {
-            .form-actions {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .btn-lg {
-                flex: 1;
-                margin-right: 15px;
-            }
-
-            .btn-secondary {
-                flex: none;
-                margin-right: 0;
-            }
-        }
-
-        .donation-grid {
-            display: grid;
-            gap: 30px;
-            margin-top: 30px;
-        }
-
-        @@media (min-width: 1024px) {
-            .donation-grid {
-                grid-template-columns: 2fr 1fr;
-                gap: 40px;
-            }
-        }
-
-        .fa-spin {
-            animation: fa-spin 2s infinite linear;
-        }
-
-        @@keyframes fa-spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+    /* Misc */
+    .donation-grid { display: grid; gap: 30px; margin-top: 20px; }
+    @@media (min-width: 1024px) { .donation-grid { grid-template-columns: 2fr 1fr; gap: 40px; } }
+    .fa-spin { animation: fa-spin 1.2s infinite linear; }
+    @@keyframes fa-spin { to { transform: rotate(360deg); } }
     </style>
+
+    <script>
+    (function () {
+        // ── Config injected from Razor ──────────────────────────────────────
+        var CASHAPP_HANDLE = '@cashAppHandle';
+        var VENMO_HANDLE   = '@venmoHandle';
+        var NOTE_ENCODED   = '@noteEncoded';
+
+        // ── DOM refs ────────────────────────────────────────────────────────
+        var amountInput    = document.getElementById('amountInput');
+        var paypalBtn      = document.getElementById('paypal-donate-btn');
+        var paidBtn        = document.getElementById('paid-btn');
+        var regularBtn     = document.getElementById('regular-donate-btn');
+        var cashAppLink    = document.getElementById('cashapp-link');
+        var venmoLink      = document.getElementById('venmo-link');
+        var cashAmtLabel   = document.getElementById('cashapp-amount-label');
+        var venmoAmtLabel  = document.getElementById('venmo-amount-label');
+
+        // Sidebar quick pay
+        var qpCashApp = document.getElementById('qp-cashapp');
+        var qpVenmo   = document.getElementById('qp-venmo');
+
+        // ── Preset amount buttons ───────────────────────────────────────────
+        document.querySelectorAll('.amount-btn').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.amount-btn').forEach(function (b) { b.classList.remove('active'); });
+                this.classList.add('active');
+                amountInput.value = this.dataset.amount;
+                updateLinks();
+            });
+        });
+        amountInput.addEventListener('input', function () {
+            document.querySelectorAll('.amount-btn').forEach(function (b) { b.classList.remove('active'); });
+            updateLinks();
+        });
+
+        // ── Quick pay sidebar amounts ───────────────────────────────────────
+        document.querySelectorAll('.qp-amt').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.qp-amt').forEach(function (b) { b.classList.remove('active'); });
+                this.classList.add('active');
+                var val = this.dataset.val;
+                if (val) {
+                    amountInput.value = val;
+                    document.querySelectorAll('.amount-btn').forEach(function (b) {
+                        b.classList.toggle('active', b.dataset.amount === val);
+                    });
+                    updateLinks();
+                }
+            });
+        });
+
+        // ── Build payment links ─────────────────────────────────────────────
+        function updateLinks() {
+            var amt = parseFloat(amountInput.value) || 0;
+            var amtStr = amt > 0 ? '$' + amt.toFixed(2) : '';
+
+            // CashApp: cash.app/$handle/amount (pre-fills amount)
+            var cashUrl = amt > 0
+                ? 'https://cash.app/' + CASHAPP_HANDLE + '/' + amt.toFixed(2)
+                : 'https://cash.app/' + CASHAPP_HANDLE;
+            if (cashAppLink) cashAppLink.href = cashUrl;
+            if (qpCashApp)   qpCashApp.href   = cashUrl;
+            if (cashAmtLabel) cashAmtLabel.textContent = amtStr || 'Enter amount above';
+
+            // Venmo: account.venmo.com/pay?recipients=handle&amount=X&note=...
+            var venmoUrl = 'https://account.venmo.com/pay?recipients=' + VENMO_HANDLE + '&note=' + NOTE_ENCODED;
+            if (amt > 0) venmoUrl += '&amount=' + amt.toFixed(2);
+            if (venmoLink) venmoLink.href = venmoUrl;
+            if (qpVenmo)   qpVenmo.href   = venmoUrl;
+            if (venmoAmtLabel) venmoAmtLabel.textContent = amtStr || 'Enter amount above';
+        }
+
+        // ── Payment method switching ────────────────────────────────────────
+        var panels = {
+            'PayPal':  { panel: 'panel-paypal',  action: 'paypal'   },
+            'CashApp': { panel: 'panel-cashapp', action: 'peer'      },
+            'Venmo':   { panel: 'panel-venmo',   action: 'peer'      },
+            'Cash':    { panel: 'panel-cash',    action: 'regular'   }
+        };
+
+        document.querySelectorAll('input[name="PaymentMethod"]').forEach(function (radio) {
+            radio.addEventListener('change', function () { switchMethod(this.value); });
+        });
+
+        function switchMethod(method) {
+            // Hide all panels
+            document.querySelectorAll('.pm-panel').forEach(function (p) { p.classList.remove('active'); });
+
+            var cfg = panels[method];
+            if (cfg) {
+                var el = document.getElementById(cfg.panel);
+                if (el) el.classList.add('active');
+            }
+
+            paypalBtn.style.display  = method === 'PayPal'  ? 'block' : 'none';
+            paidBtn.style.display    = (method === 'CashApp' || method === 'Venmo') ? 'block' : 'none';
+            regularBtn.style.display = method === 'Cash'    ? 'block' : 'none';
+        }
+
+        // ── PayPal flow ─────────────────────────────────────────────────────
+        paypalBtn.addEventListener('click', function () {
+            var form     = document.getElementById('donationForm');
+            var formData = new FormData(form);
+            var amount    = formData.get('Amount');
+            var donorName = formData.get('DonorName');
+
+            if (!amount || parseFloat(amount) <= 0) { alert('Please enter a valid donation amount.'); return; }
+            if (!donorName) { alert('Please enter your full name.'); return; }
+
+            paypalBtn.disabled = true;
+            paypalBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing…';
+
+            fetch('/Home/CreatePayPalPayment', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({
+                    MasjidProjectId: parseInt(formData.get('MasjidProjectId')),
+                    Amount:    parseFloat(amount),
+                    DonorName: donorName,
+                    Email:     formData.get('Email') || '',
+                    Message:   formData.get('Message') || '',
+                    IsAnonymous: formData.get('IsAnonymous') === 'true'
+                })
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (res) {
+                if (res.success && res.approvalUrl) {
+                    window.location.href = res.approvalUrl;
+                } else {
+                    alert('Error: ' + (res.message || 'Could not create PayPal payment.'));
+                    paypalBtn.disabled = false;
+                    paypalBtn.innerHTML = '<i class="fab fa-paypal"></i> Donate with PayPal';
+                }
+            })
+            .catch(function () {
+                alert('Network error. Please try again.');
+                paypalBtn.disabled = false;
+                paypalBtn.innerHTML = '<i class="fab fa-paypal"></i> Donate with PayPal';
+            });
+        });
+
+        // ── Copy note helper ────────────────────────────────────────────────
+        window.copyNote = function (id) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            navigator.clipboard.writeText(el.textContent).then(function () {
+                var btn = el.nextElementSibling;
+                btn.innerHTML = '<i class="fas fa-check"></i>';
+                setTimeout(function () { btn.innerHTML = '<i class="fas fa-copy"></i>'; }, 1800);
+            });
+        };
+
+        // ── Init ────────────────────────────────────────────────────────────
+        updateLinks();
+        switchMethod('PayPal');
+    })();
+    </script>
 }

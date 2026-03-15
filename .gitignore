@@ -1,0 +1,117 @@
+# ============================================================
+# .NET / ASP.NET Core
+# ============================================================
+bin/
+obj/
+publish/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+!**/packages/repositories.config
+
+# ============================================================
+# Visual Studio
+# ============================================================
+.vs/
+*.rsuser
+*.vsp
+*.vspx
+*.sap
+*.vcxproj.filters
+_ReSharper*/
+*.ReSharper
+*.DotSettings.user
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.VC.db
+*.VC.VC.opendb
+*.pidb
+*.svclog
+*.scc
+
+# ============================================================
+# VS Code
+# ============================================================
+.vscode/
+!.vscode/extensions.json
+
+# ============================================================
+# Rider / JetBrains
+# ============================================================
+.idea/
+*.iml
+
+# ============================================================
+# Secrets & Environment
+# ============================================================
+appsettings.Production.json
+appsettings.Local.json
+*.pfx
+*.p12
+*.key
+*.pem
+secrets.json
+*.env
+.env
+.env.*
+
+# GCP service account keys
+*-credentials.json
+*-key.json
+service-account*.json
+gcp-key*.json
+
+# ============================================================
+# Entity Framework
+# ============================================================
+# Keep Migrations folder but ignore snapshots if regenerated
+# (comment out below if you want to track migrations)
+# Migrations/
+
+# ============================================================
+# Docker
+# ============================================================
+.dockerignore
+
+# ============================================================
+# OS generated
+# ============================================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V8
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ============================================================
+# Logs & temp
+# ============================================================
+*.log
+*.tmp
+*.temp
+logs/
+log/
+
+# ============================================================
+# Node / LibMan (client-side libs)
+# ============================================================
+node_modules/
+wwwroot/lib/
+npm-debug.log*
+
+# ============================================================
+# Static site assets (if auto-generated)
+# ============================================================
+wwwroot/dist/

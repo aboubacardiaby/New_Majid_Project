@@ -1,0 +1,419 @@
+@model GambianMuslimCommunity.Models.Member
+@{
+    ViewData["Title"] = "Join Our Community - Member Registration";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<main class="main-content">
+    <!-- Hero Section -->
+    <section class="hero-section bg-gradient" style="background: linear-gradient(135deg, #1a4c5c 0%, #2d6e42 100%); padding: 100px 0 60px; margin-bottom: 0;">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <h1 class="hero-title text-white mb-4" style="font-size: 2.8rem; font-weight: 700;">
+                        <i class="fas fa-users text-success me-3"></i>
+                        Join Our Community
+                    </h1>
+                    <p class="hero-subtitle text-white-75 mb-0" style="font-size: 1.2rem; opacity: 0.9;">
+                        Assalamu Alaikum! Become a member of the Gambian Muslim Community in Minnesota and connect with our vibrant Islamic community.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration Form Section -->
+    <section class="py-5" style="background-color: #f8f9fa;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <!-- Information Card -->
+                    <div class="card shadow-sm border-0 mb-4">
+                        <div class="card-body p-4" style="background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);">
+                            <div class="row align-items-center">
+                                <div class="col-md-8">
+                                    <h5 class="text-success mb-2">
+                                        <i class="fas fa-info-circle me-2"></i>
+                                        Membership Benefits
+                                    </h5>
+                                    <p class="mb-0 text-muted">
+                                        As a community member, you'll receive updates about Islamic events, prayer schedules, educational programs, and opportunities to contribute to our masjid building project.
+                                    </p>
+                                </div>
+                                <div class="col-md-4 text-center">
+                                    <i class="fas fa-mosque text-success" style="font-size: 3rem; opacity: 0.7;"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Registration Form -->
+                    <div class="card shadow border-0">
+                        <div class="card-header bg-success text-white">
+                            <h4 class="card-title mb-0">
+                                <i class="fas fa-edit me-2"></i>
+                                Registration Form
+                            </h4>
+                        </div>
+                        <div class="card-body p-4">
+                            <form asp-action="Register" method="post" id="registrationForm">
+                                <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                                <!-- Personal Information -->
+                                <div class="form-section mb-4">
+                                    <h5 class="section-title text-success border-bottom border-success pb-2 mb-3">
+                                        <i class="fas fa-user me-2"></i>
+                                        Personal Information
+                                    </h5>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="FirstName" class="form-label fw-bold">First Name *</label>
+                                            <input asp-for="FirstName" class="form-control form-control-lg" placeholder="Enter your first name" />
+                                            <span asp-validation-for="FirstName" class="text-danger small"></span>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="LastName" class="form-label fw-bold">Last Name *</label>
+                                            <input asp-for="LastName" class="form-control form-control-lg" placeholder="Enter your last name" />
+                                            <span asp-validation-for="LastName" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="Email" class="form-label fw-bold">Email Address *</label>
+                                            <input asp-for="Email" type="email" class="form-control form-control-lg" placeholder="your.email@example.com" />
+                                            <span asp-validation-for="Email" class="text-danger small"></span>
+                                            <div class="form-text">We'll use this to send you important community updates</div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="PhoneNumber" class="form-label fw-bold">Phone Number *</label>
+                                            <input asp-for="PhoneNumber" class="form-control form-control-lg" placeholder="(xxx) xxx-xxxx" />
+                                            <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label asp-for="DateOfBirth" class="form-label fw-bold">Date of Birth *</label>
+                                            <input asp-for="DateOfBirth" type="date" class="form-control form-control-lg" />
+                                            <span asp-validation-for="DateOfBirth" class="text-danger small"></span>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label asp-for="Gender" class="form-label fw-bold">Gender *</label>
+                                            <select asp-for="Gender" class="form-select form-select-lg">
+                                                <option value="">Select Gender</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                            </select>
+                                            <span asp-validation-for="Gender" class="text-danger small"></span>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label asp-for="MaritalStatus" class="form-label fw-bold">Marital Status</label>
+                                            <select asp-for="MaritalStatus" class="form-select form-select-lg">
+                                                <option value="">Select Status</option>
+                                                <option value="Single">Single</option>
+                                                <option value="Married">Married</option>
+                                                <option value="Divorced">Divorced</option>
+                                                <option value="Widowed">Widowed</option>
+                                            </select>
+                                            <span asp-validation-for="MaritalStatus" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="Profession" class="form-label fw-bold">Profession/Occupation</label>
+                                            <input asp-for="Profession" class="form-control form-control-lg" placeholder="Your profession or job title" />
+                                            <span asp-validation-for="Profession" class="text-danger small"></span>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="Nationality" class="form-label fw-bold">Nationality</label>
+                                            <input asp-for="Nationality" class="form-control form-control-lg" placeholder="e.g., Gambian, American" />
+                                            <span asp-validation-for="Nationality" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Address Information -->
+                                <div class="form-section mb-4">
+                                    <h5 class="section-title text-success border-bottom border-success pb-2 mb-3">
+                                        <i class="fas fa-map-marker-alt me-2"></i>
+                                        Address Information
+                                    </h5>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="Address" class="form-label fw-bold">Street Address</label>
+                                        <input asp-for="Address" class="form-control form-control-lg" placeholder="1234 Main Street" />
+                                        <span asp-validation-for="Address" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label asp-for="City" class="form-label fw-bold">City</label>
+                                            <input asp-for="City" class="form-control form-control-lg" placeholder="Minneapolis" />
+                                            <span asp-validation-for="City" class="text-danger small"></span>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label asp-for="State" class="form-label fw-bold">State/Province</label>
+                                            <input asp-for="State" class="form-control form-control-lg" placeholder="MN" />
+                                            <span asp-validation-for="State" class="text-danger small"></span>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label asp-for="PostalCode" class="form-label fw-bold">Postal Code</label>
+                                            <input asp-for="PostalCode" class="form-control form-control-lg" placeholder="55401" />
+                                            <span asp-validation-for="PostalCode" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label asp-for="Country" class="form-label fw-bold">Country</label>
+                                        <select asp-for="Country" class="form-select form-select-lg">
+                                            <option value="">Select Country</option>
+                                            <option value="United States">United States</option>
+                                            <option value="Canada">Canada</option>
+                                            <option value="Gambia">Gambia</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <span asp-validation-for="Country" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Emergency Contact -->
+                                <div class="form-section mb-4">
+                                    <h5 class="section-title text-success border-bottom border-success pb-2 mb-3">
+                                        <i class="fas fa-phone me-2"></i>
+                                        Emergency Contact
+                                    </h5>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label asp-for="EmergencyContactName" class="form-label fw-bold">Contact Name</label>
+                                            <input asp-for="EmergencyContactName" class="form-control form-control-lg" placeholder="Full name" />
+                                            <span asp-validation-for="EmergencyContactName" class="text-danger small"></span>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label asp-for="EmergencyContactPhone" class="form-label fw-bold">Contact Phone</label>
+                                            <input asp-for="EmergencyContactPhone" class="form-control form-control-lg" placeholder="(xxx) xxx-xxxx" />
+                                            <span asp-validation-for="EmergencyContactPhone" class="text-danger small"></span>
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label asp-for="EmergencyContactRelationship" class="form-label fw-bold">Relationship</label>
+                                            <select asp-for="EmergencyContactRelationship" class="form-select form-select-lg">
+                                                <option value="">Select Relationship</option>
+                                                <option value="Spouse">Spouse</option>
+                                                <option value="Parent">Parent</option>
+                                                <option value="Sibling">Brother/Sister</option>
+                                                <option value="Child">Child</option>
+                                                <option value="Friend">Friend</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                            <span asp-validation-for="EmergencyContactRelationship" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Communication Preferences -->
+                                <div class="form-section mb-4">
+                                    <h5 class="section-title text-success border-bottom border-success pb-2 mb-3">
+                                        <i class="fas fa-cog me-2"></i>
+                                        Communication Preferences
+                                    </h5>
+                                    
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <div class="form-check form-switch">
+                                                <input asp-for="ReceiveEmailNotifications" class="form-check-input" type="checkbox" checked />
+                                                <label asp-for="ReceiveEmailNotifications" class="form-check-label fw-bold">
+                                                    Receive Email Notifications
+                                                </label>
+                                                <div class="form-text">Get updates about events, prayers, and community news</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <div class="form-check form-switch">
+                                                <input asp-for="ReceiveSmsNotifications" class="form-check-input" type="checkbox" checked />
+                                                <label asp-for="ReceiveSmsNotifications" class="form-check-label fw-bold">
+                                                    Receive SMS Notifications
+                                                </label>
+                                                <div class="form-text">Get urgent updates and prayer reminders via text</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label asp-for="PreferredLanguage" class="form-label fw-bold">Preferred Language</label>
+                                            <select asp-for="PreferredLanguage" class="form-select form-select-lg">
+                                                <option value="English">English</option>
+                                                <option value="Mandinka">Mandinka</option>
+                                                <option value="Wolof">Wolof</option>
+                                                <option value="Fula">Fula</option>
+                                                <option value="Arabic">Arabic</option>
+                                            </select>
+                                            <span asp-validation-for="PreferredLanguage" class="text-danger small"></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Additional Notes -->
+                                <div class="form-section mb-4">
+                                    <h5 class="section-title text-success border-bottom border-success pb-2 mb-3">
+                                        <i class="fas fa-comment me-2"></i>
+                                        Additional Information
+                                    </h5>
+                                    
+                                    <div class="mb-3">
+                                        <label asp-for="Notes" class="form-label fw-bold">Additional Notes</label>
+                                        <textarea asp-for="Notes" class="form-control" rows="3" 
+                                                placeholder="Any additional information you'd like to share about yourself, your Islamic journey, or how you'd like to contribute to the community..."></textarea>
+                                        <span asp-validation-for="Notes" class="text-danger small"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Terms and Submit -->
+                                <div class="form-section">
+                                    <div class="mb-4">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="terms" required />
+                                            <label class="form-check-label fw-bold" for="terms">
+                                                I agree to abide by the community guidelines and Islamic principles that guide our masjid. *
+                                            </label>
+                                        </div>
+                                        <div class="form-text mt-2">
+                                            By registering, you agree to participate respectfully in our Islamic community and support our mission of serving Allah (SWT) and the Gambian Muslim community in Minnesota.
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                                        <button type="submit" class="btn btn-success btn-lg px-5 me-md-2">
+                                            <i class="fas fa-paper-plane me-2"></i>
+                                            Submit Registration
+                                        </button>
+                                        <a href="/" class="btn btn-outline-secondary btn-lg px-4">
+                                            <i class="fas fa-arrow-left me-2"></i>
+                                            Back to Home
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    
+    <script>
+        // Form validation and enhancement
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('registrationForm');
+            
+            // Phone number formatting
+            const phoneInputs = document.querySelectorAll('input[type="tel"], input[name="PhoneNumber"], input[name="EmergencyContactPhone"]');
+            phoneInputs.forEach(input => {
+                input.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/\D/g, '');
+                    if (value.length >= 6) {
+                        value = value.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3');
+                    } else if (value.length >= 3) {
+                        value = value.replace(/(\d{3})(\d{3})/, '($1) $2');
+                    }
+                    e.target.value = value;
+                });
+            });
+            
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                const termsCheckbox = document.getElementById('terms');
+                if (!termsCheckbox.checked) {
+                    e.preventDefault();
+                    alert('Please agree to the community guidelines before submitting.');
+                    termsCheckbox.focus();
+                    return false;
+                }
+                
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Submitting...';
+                submitBtn.disabled = true;
+                
+                // Re-enable after a delay if form is invalid
+                setTimeout(() => {
+                    if (submitBtn.disabled) {
+                        submitBtn.innerHTML = originalText;
+                        submitBtn.disabled = false;
+                    }
+                }, 5000);
+            });
+            
+            // Auto-fill country if US phone format detected
+            const phoneInput = document.querySelector('input[name="PhoneNumber"]');
+            const countrySelect = document.querySelector('select[name="Country"]');
+            
+            phoneInput.addEventListener('blur', function() {
+                const value = this.value.replace(/\D/g, '');
+                if (value.length === 10 && !countrySelect.value) {
+                    countrySelect.value = 'United States';
+                }
+            });
+        });
+    </script>
+    
+    <style>
+        .form-section {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e9ecef;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.2rem rgba(25, 135, 84, 0.25);
+        }
+        
+        .hero-section {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('/images/islamic-pattern.png') repeat;
+            opacity: 0.1;
+            z-index: 0;
+        }
+        
+        .hero-section > .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        @@media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem !important;
+            }
+            
+            .form-section {
+                padding: 1rem;
+            }
+        }
+    </style>
+}

@@ -187,13 +187,25 @@ namespace GambianMuslimCommunity.Migrations
                         {
                             Id = 1,
                             CreatedBy = "System",
-                            CreatedDate = new DateTime(2025, 7, 19, 0, 0, 0, 0, DateTimeKind.Local),
+                            CreatedDate = new DateTime(2025, 8, 14, 0, 0, 0, 0, DateTimeKind.Local),
                             Email = "admin@gambianmuslimcommunity.org",
                             FullName = "System Administrator",
                             IsActive = true,
                             PasswordHash = "$2a$11$N.Kt4q5BKkYLGgpF.jKMu.J0WpFbOJGnvf9..jvVt8OAVS5PCIK3y",
                             Role = "SuperAdmin",
                             Username = "admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedBy = "System",
+                            CreatedDate = new DateTime(2025, 8, 14, 0, 0, 0, 0, DateTimeKind.Local),
+                            Email = "ab.diaby@gmail.com",
+                            FullName = "Abou Diaby",
+                            IsActive = true,
+                            PasswordHash = "$2a$11$BTi6nbWb.ghlB/7/m1vK0e8F29NoZesgDleVVVbU9L0feRaU6vn/S",
+                            Role = "SuperAdmin",
+                            Username = "aboudiaby"
                         });
                 });
 
@@ -244,7 +256,7 @@ namespace GambianMuslimCommunity.Migrations
                             Id = 1,
                             Description = "Join us for a community iftar during Ramadan",
                             EndTime = new TimeSpan(0, 20, 0, 0, 0),
-                            EventDate = new DateTime(2025, 8, 28, 0, 0, 0, 0, DateTimeKind.Local),
+                            EventDate = new DateTime(2025, 9, 23, 0, 0, 0, 0, DateTimeKind.Local),
                             EventType = "Religious",
                             Location = "Community Center",
                             StartTime = new TimeSpan(0, 18, 0, 0, 0),
@@ -255,7 +267,7 @@ namespace GambianMuslimCommunity.Migrations
                             Id = 2,
                             Description = "Learn about Islamic history and jurisprudence",
                             EndTime = new TimeSpan(0, 16, 0, 0, 0),
-                            EventDate = new DateTime(2025, 9, 12, 0, 0, 0, 0, DateTimeKind.Local),
+                            EventDate = new DateTime(2025, 10, 8, 0, 0, 0, 0, DateTimeKind.Local),
                             EventType = "Educational",
                             Location = "Main Hall",
                             StartTime = new TimeSpan(0, 14, 0, 0, 0),
@@ -266,7 +278,7 @@ namespace GambianMuslimCommunity.Migrations
                             Id = 3,
                             Description = "Islamic education and activities for young Muslims",
                             EndTime = new TimeSpan(0, 12, 0, 0, 0),
-                            EventDate = new DateTime(2025, 9, 19, 0, 0, 0, 0, DateTimeKind.Local),
+                            EventDate = new DateTime(2025, 10, 15, 0, 0, 0, 0, DateTimeKind.Local),
                             EventType = "Youth",
                             Location = "Youth Center",
                             StartTime = new TimeSpan(0, 10, 0, 0, 0),
@@ -322,6 +334,66 @@ namespace GambianMuslimCommunity.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ContactMessages");
+                });
+
+            modelBuilder.Entity("GambianMuslimCommunity.Models.ContributionTracker", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AverageContribution")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("ContributionCount")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContributionNotes")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContributorName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<DateTime>("FirstContributionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsActiveContributor")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastContributionDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("LastUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PreferredPaymentMethod")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("TotalContributions")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ContributionTrackers");
                 });
 
             modelBuilder.Entity("GambianMuslimCommunity.Models.MasjidDonation", b =>
@@ -468,20 +540,256 @@ namespace GambianMuslimCommunity.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedDate = new DateTime(2025, 7, 19, 0, 0, 0, 0, DateTimeKind.Local),
+                            CreatedDate = new DateTime(2025, 8, 14, 0, 0, 0, 0, DateTimeKind.Local),
                             CurrentAmount = 125000m,
                             Description = "Alhamdulillah, by the grace of Allah (SWT), we are embarking on building a new masjid to serve our growing Gambian Muslim community in Minnesota. This masjid will provide a dedicated space for our five daily prayers, Jummah prayers, Islamic education, and community gatherings. The new facility will include a main prayer hall, separate women's prayer area, classrooms for Islamic studies, community kitchen, and parking facilities.",
                             ImageUrl = "/images/masjid-project.jpg",
                             IsActive = true,
                             IsFeatured = true,
                             Location = "Minneapolis, MN - 15 minutes from current location",
-                            StartDate = new DateTime(2025, 7, 19, 0, 0, 0, 0, DateTimeKind.Local),
+                            StartDate = new DateTime(2025, 8, 14, 0, 0, 0, 0, DateTimeKind.Local),
                             Status = "Fundraising",
                             TargetAmount = 500000m,
-                            TargetCompletionDate = new DateTime(2026, 8, 18, 0, 0, 0, 0, DateTimeKind.Local),
+                            TargetCompletionDate = new DateTime(2026, 9, 13, 0, 0, 0, 0, DateTimeKind.Local),
                             Title = "New Masjid Building Project",
                             Updates = "Alhamdulillah! We have secured the land and received initial construction permits. Phase 1 fundraising is 25% complete. May Allah (SWT) bless all our donors and supporters."
                         });
+                });
+
+            modelBuilder.Entity("GambianMuslimCommunity.Models.Member", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("ApprovedById")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ApprovedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("EmergencyContactName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("EmergencyContactPhone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("EmergencyContactRelationship")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("LastName")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("MaritalStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("MembershipStatus")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<string>("Nationality")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Notes")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("PreferredLanguage")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasDefaultValue("English");
+
+                    b.Property<string>("Profession")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<bool>("ReceiveEmailNotifications")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("ReceiveSmsNotifications")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("RegistrationDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovedById");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.ToTable("Members");
+                });
+
+            modelBuilder.Entity("GambianMuslimCommunity.Models.MemberActivityLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("ActivityDate")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<int?>("AdminUserId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Entity")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("MemberId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminUserId");
+
+                    b.HasIndex("MemberId");
+
+                    b.ToTable("MemberActivityLogs");
+                });
+
+            modelBuilder.Entity("GambianMuslimCommunity.Models.MembershipSettings", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<DateTime>("LastModified")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<int?>("ModifiedById")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SettingKey")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("SettingValue")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ModifiedById");
+
+                    b.HasIndex("SettingKey")
+                        .IsUnique();
+
+                    b.ToTable("MembershipSettings");
                 });
 
             modelBuilder.Entity("GambianMuslimCommunity.Models.PrayerTimeEntity", b =>
@@ -522,7 +830,7 @@ namespace GambianMuslimCommunity.Migrations
                         {
                             Id = 1,
                             City = "Minneapolis, MN",
-                            Date = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Local),
+                            Date = new DateTime(2025, 9, 13, 0, 0, 0, 0, DateTimeKind.Local),
                             IsActive = true,
                             Name = "Fajr",
                             Time = new TimeSpan(0, 5, 45, 0, 0)
@@ -531,7 +839,7 @@ namespace GambianMuslimCommunity.Migrations
                         {
                             Id = 2,
                             City = "Minneapolis, MN",
-                            Date = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Local),
+                            Date = new DateTime(2025, 9, 13, 0, 0, 0, 0, DateTimeKind.Local),
                             IsActive = true,
                             Name = "Dhuhr",
                             Time = new TimeSpan(0, 12, 15, 0, 0)
@@ -540,7 +848,7 @@ namespace GambianMuslimCommunity.Migrations
                         {
                             Id = 3,
                             City = "Minneapolis, MN",
-                            Date = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Local),
+                            Date = new DateTime(2025, 9, 13, 0, 0, 0, 0, DateTimeKind.Local),
                             IsActive = true,
                             Name = "Asr",
                             Time = new TimeSpan(0, 14, 30, 0, 0)
@@ -549,7 +857,7 @@ namespace GambianMuslimCommunity.Migrations
                         {
                             Id = 4,
                             City = "Minneapolis, MN",
-                            Date = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Local),
+                            Date = new DateTime(2025, 9, 13, 0, 0, 0, 0, DateTimeKind.Local),
                             IsActive = true,
                             Name = "Maghrib",
                             Time = new TimeSpan(0, 16, 45, 0, 0)
@@ -558,7 +866,7 @@ namespace GambianMuslimCommunity.Migrations
                         {
                             Id = 5,
                             City = "Minneapolis, MN",
-                            Date = new DateTime(2025, 8, 18, 0, 0, 0, 0, DateTimeKind.Local),
+                            Date = new DateTime(2025, 9, 13, 0, 0, 0, 0, DateTimeKind.Local),
                             IsActive = true,
                             Name = "Isha",
                             Time = new TimeSpan(0, 18, 15, 0, 0)
@@ -706,7 +1014,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "General",
                             Description = "The name of the website",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7685),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4947),
                             ModifiedBy = "",
                             SettingKey = "SiteName",
                             SettingValue = "Gambian Muslim Community in Minnesota"
@@ -717,7 +1025,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "General",
                             Description = "Brief description of the website",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7689),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4951),
                             ModifiedBy = "",
                             SettingKey = "SiteDescription",
                             SettingValue = "Serving the Gambian Muslim community in Minnesota with Islamic services, education, and support"
@@ -728,7 +1036,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Contact",
                             Description = "Primary contact email address",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7691),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4953),
                             ModifiedBy = "",
                             SettingKey = "ContactEmail",
                             SettingValue = "info@gambianmuslimcommunity.org"
@@ -739,7 +1047,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Contact",
                             Description = "Primary contact phone number",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7692),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4955),
                             ModifiedBy = "",
                             SettingKey = "ContactPhone",
                             SettingValue = "(612) 555-0123"
@@ -750,7 +1058,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Contact",
                             Description = "Physical address",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7694),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4957),
                             ModifiedBy = "",
                             SettingKey = "Address",
                             SettingValue = "123 Main Street"
@@ -761,7 +1069,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Contact",
                             Description = "City",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7695),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4959),
                             ModifiedBy = "",
                             SettingKey = "City",
                             SettingValue = "Minneapolis"
@@ -772,7 +1080,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Contact",
                             Description = "State",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7697),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4961),
                             ModifiedBy = "",
                             SettingKey = "State",
                             SettingValue = "MN"
@@ -783,7 +1091,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Contact",
                             Description = "ZIP code",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7699),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4963),
                             ModifiedBy = "",
                             SettingKey = "ZipCode",
                             SettingValue = "55401"
@@ -794,10 +1102,43 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "General",
                             Description = "Name of the community imam",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7700),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4964),
                             ModifiedBy = "",
                             SettingKey = "ImamName",
                             SettingValue = "Imam Abdullah Jallow"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Category = "General",
+                            Description = "Imam's welcome message to the community",
+                            IsActive = true,
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4966),
+                            ModifiedBy = "",
+                            SettingKey = "ImamWelcomeMessage",
+                            SettingValue = "Assalamu Alaikum wa Rahmatullahi wa Barakatuh, dear brothers and sisters. Welcome to our vibrant Gambian Muslim Community in Minnesota. May Allah (SWT) bless you and your families as we come together to worship, learn, and support one another in faith. Our community is a place where Islamic values flourish, cultural heritage is preserved, and bonds of brotherhood and sisterhood grow stronger each day."
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Category = "General",
+                            Description = "URL for the Imam's photo",
+                            IsActive = true,
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4968),
+                            ModifiedBy = "",
+                            SettingKey = "ImamImageUrl",
+                            SettingValue = "/images/imam-placeholder.jpg"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Category = "General",
+                            Description = "Imam's title or position",
+                            IsActive = true,
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4970),
+                            ModifiedBy = "",
+                            SettingKey = "ImamTitle",
+                            SettingValue = "Community Imam & Spiritual Leader"
                         },
                         new
                         {
@@ -805,7 +1146,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Social",
                             Description = "Facebook page URL",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7702),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4972),
                             ModifiedBy = "",
                             SettingKey = "FacebookUrl",
                             SettingValue = "https://facebook.com/gambianmuslimcommunity"
@@ -816,7 +1157,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Social",
                             Description = "Instagram page URL",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7703),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4973),
                             ModifiedBy = "",
                             SettingKey = "InstagramUrl",
                             SettingValue = "https://instagram.com/gambianmuslimmn"
@@ -827,7 +1168,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Social",
                             Description = "WhatsApp contact number",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7705),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4975),
                             ModifiedBy = "",
                             SettingKey = "WhatsAppNumber",
                             SettingValue = "+16125550123"
@@ -838,7 +1179,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "General",
                             Description = "Website logo URL",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7706),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4977),
                             ModifiedBy = "",
                             SettingKey = "LogoUrl",
                             SettingValue = "/images/logo.png"
@@ -849,7 +1190,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Email",
                             Description = "SMTP server for sending emails",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7708),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4979),
                             ModifiedBy = "",
                             SettingKey = "SmtpServer",
                             SettingValue = "smtp.gmail.com"
@@ -860,7 +1201,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Email",
                             Description = "SMTP server port",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7709),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4981),
                             ModifiedBy = "",
                             SettingKey = "SmtpPort",
                             SettingValue = "587"
@@ -871,7 +1212,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Email",
                             Description = "From email address for system emails",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7711),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4983),
                             ModifiedBy = "",
                             SettingKey = "FromEmail",
                             SettingValue = "noreply@gambianmuslimcommunity.org"
@@ -882,7 +1223,7 @@ namespace GambianMuslimCommunity.Migrations
                             Category = "Email",
                             Description = "From name for system emails",
                             IsActive = true,
-                            LastModified = new DateTime(2025, 8, 18, 9, 31, 13, 139, DateTimeKind.Local).AddTicks(7713),
+                            LastModified = new DateTime(2025, 9, 13, 16, 24, 15, 858, DateTimeKind.Local).AddTicks(4984),
                             ModifiedBy = "",
                             SettingKey = "FromName",
                             SettingValue = "Gambian Muslim Community"
@@ -922,11 +1263,54 @@ namespace GambianMuslimCommunity.Migrations
                     b.Navigation("MasjidProject");
                 });
 
+            modelBuilder.Entity("GambianMuslimCommunity.Models.Member", b =>
+                {
+                    b.HasOne("GambianMuslimCommunity.Models.AdminUser", "ApprovedBy")
+                        .WithMany()
+                        .HasForeignKey("ApprovedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ApprovedBy");
+                });
+
+            modelBuilder.Entity("GambianMuslimCommunity.Models.MemberActivityLog", b =>
+                {
+                    b.HasOne("GambianMuslimCommunity.Models.AdminUser", "AdminUser")
+                        .WithMany()
+                        .HasForeignKey("AdminUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("GambianMuslimCommunity.Models.Member", "Member")
+                        .WithMany("ActivityLogs")
+                        .HasForeignKey("MemberId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AdminUser");
+
+                    b.Navigation("Member");
+                });
+
+            modelBuilder.Entity("GambianMuslimCommunity.Models.MembershipSettings", b =>
+                {
+                    b.HasOne("GambianMuslimCommunity.Models.AdminUser", "ModifiedBy")
+                        .WithMany()
+                        .HasForeignKey("ModifiedById")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ModifiedBy");
+                });
+
             modelBuilder.Entity("GambianMuslimCommunity.Models.AdminUser", b =>
                 {
                     b.Navigation("ActivityLogs");
 
                     b.Navigation("Sessions");
+                });
+
+            modelBuilder.Entity("GambianMuslimCommunity.Models.Member", b =>
+                {
+                    b.Navigation("ActivityLogs");
                 });
 #pragma warning restore 612, 618
         }

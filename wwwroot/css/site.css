@@ -192,6 +192,202 @@ header {
     width: 100%;
 }
 
+/* Imam Welcome Section */
+.imam-welcome {
+    padding: 80px 0;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    position: relative;
+}
+
+.imam-welcome::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='%23e0e0e0' fill-opacity='0.03'%3E%3Cpath d='M20 20c0-11.046-8.954-20-20-20s-20 8.954-20 20 8.954 20 20 20 20-8.954 20-20zm-20 18c-9.941 0-18-8.059-18-18s8.059-18 18-18 18 8.059 18 18-8.059 18-18 18z'/%3E%3C/g%3E%3C/svg%3E");
+    opacity: 0.5;
+}
+
+.imam-welcome-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 50px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.imam-welcome-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--gradient-primary);
+}
+
+.imam-content {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 40px;
+    align-items: center;
+}
+
+.imam-image {
+    position: relative;
+    min-width: 180px;
+}
+
+.imam-image img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid var(--white);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.imam-image:hover img {
+    transform: scale(1.05);
+}
+
+.imam-badge {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 50px;
+    height: 50px;
+    background: var(--gradient-secondary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.imam-message {
+    flex: 1;
+}
+
+.imam-header h2 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
+.imam-title {
+    color: var(--secondary-color);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+    font-style: italic;
+}
+
+.imam-quote {
+    position: relative;
+    margin: 0;
+    padding: 30px 0;
+    border: none;
+}
+
+.quote-icon {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 3rem;
+    color: var(--secondary-color);
+    opacity: 0.3;
+}
+
+.imam-quote p {
+    font-size: 1.3rem;
+    line-height: 1.8;
+    color: var(--text-dark);
+    margin: 0;
+    font-weight: 400;
+    text-align: justify;
+}
+
+.imam-signature {
+    display: flex;
+    align-items: center;
+    margin-top: 30px;
+    gap: 15px;
+}
+
+.signature-line {
+    width: 60px;
+    height: 2px;
+    background: var(--secondary-color);
+}
+
+.signature-text {
+    color: var(--primary-color);
+    font-weight: 600;
+    font-size: 1.1rem;
+    font-family: 'Amiri', serif;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .imam-welcome {
+        padding: 60px 0;
+    }
+
+    .imam-welcome-card {
+        padding: 30px 20px;
+        border-radius: 15px;
+    }
+
+    .imam-content {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        text-align: center;
+    }
+
+    .imam-image {
+        justify-self: center;
+        min-width: auto;
+    }
+
+    .imam-image img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .imam-badge {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        bottom: 5px;
+        right: 5px;
+    }
+
+    .imam-header h2 {
+        font-size: 2rem;
+    }
+
+    .imam-title {
+        font-size: 1.1rem;
+    }
+
+    .imam-quote p {
+        font-size: 1.1rem;
+        text-align: center;
+    }
+
+    .imam-signature {
+        justify-content: center;
+    }
+}
+
 .hamburger {
     display: none;
     flex-direction: column;
@@ -969,7 +1165,7 @@ header {
     color: var(--white);
     text-align: center;
     padding: 120px 0 60px;
-    margin-top: 80px;
+    margin-top: 102px;
 }
 
 .page-header h1 {

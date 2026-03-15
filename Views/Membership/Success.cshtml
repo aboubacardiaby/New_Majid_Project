@@ -1,0 +1,270 @@
+@{
+    ViewData["Title"] = "Registration Successful - Thank You";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<main class="main-content">
+    <!-- Hero Section -->
+    <section class="success-hero py-5" style="background: linear-gradient(135deg, #1a4c5c 0%, #2d6e42 100%); min-height: 60vh; display: flex; align-items: center;">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <!-- Success Icon -->
+                    <div class="success-icon mb-4">
+                        <div class="icon-circle mx-auto" style="width: 120px; height: 120px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(10px);">
+                            <i class="fas fa-check-circle text-white" style="font-size: 4rem;"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Success Message -->
+                    <h1 class="text-white mb-4" style="font-size: 2.5rem; font-weight: 700;">
+                        Barakallahu Feek!
+                    </h1>
+                    <h2 class="text-white mb-4" style="font-size: 1.5rem; font-weight: 400; opacity: 0.9;">
+                        Registration Successful
+                    </h2>
+                    
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success border-0 shadow-sm mx-auto" style="max-width: 600px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px);">
+                            <i class="fas fa-info-circle me-2"></i>
+                            @TempData["SuccessMessage"]
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="text-white-75 mb-4" style="font-size: 1.1rem; opacity: 0.8; max-width: 600px; margin: 0 auto;">
+                            Assalamu Alaikum! Thank you for joining our community. Your membership application has been submitted successfully and is now pending review by our administrators. You will receive an email confirmation once your application is processed.
+                        </p>
+                    }
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Next Steps Section -->
+    <section class="py-5" style="background-color: #f8f9fa;">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="text-center mb-5">
+                        <h3 class="text-success mb-3">
+                            <i class="fas fa-list-check me-2"></i>
+                            What Happens Next?
+                        </h3>
+                        <p class="text-muted">Here's what you can expect in the coming days</p>
+                    </div>
+                    
+                    <div class="row">
+                        <!-- Step 1 -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center p-4">
+                                    <div class="step-icon mb-3">
+                                        <div class="icon-circle mx-auto bg-primary text-white" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-envelope" style="font-size: 1.5rem;"></i>
+                                        </div>
+                                    </div>
+                                    <h5 class="card-title text-primary">1. Confirmation Email</h5>
+                                    <p class="card-text text-muted">
+                                        You'll receive an email confirmation within 24 hours acknowledging receipt of your application.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 2 -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center p-4">
+                                    <div class="step-icon mb-3">
+                                        <div class="icon-circle mx-auto bg-warning text-white" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-user-check" style="font-size: 1.5rem;"></i>
+                                        </div>
+                                    </div>
+                                    <h5 class="card-title text-warning">2. Application Review</h5>
+                                    <p class="card-text text-muted">
+                                        Our community administrators will review your application within 3-5 business days.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step 3 -->
+                        <div class="col-md-4 mb-4">
+                            <div class="card border-0 shadow-sm h-100">
+                                <div class="card-body text-center p-4">
+                                    <div class="step-icon mb-3">
+                                        <div class="icon-circle mx-auto bg-success text-white" style="width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fas fa-users" style="font-size: 1.5rem;"></i>
+                                        </div>
+                                    </div>
+                                    <h5 class="card-title text-success">3. Welcome to Community</h5>
+                                    <p class="card-text text-muted">
+                                        Once approved, you'll receive welcome materials and access to community events.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Community Information Section -->
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="row">
+                        <!-- Community Events -->
+                        <div class="col-md-6 mb-4">
+                            <div class="info-card h-100">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex align-items-start">
+                                            <div class="icon-wrapper me-3">
+                                                <i class="fas fa-calendar-alt text-primary" style="font-size: 2rem;"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="card-title text-primary">Stay Connected</h5>
+                                                <p class="card-text text-muted">
+                                                    While your application is being processed, feel free to attend our community events and Friday prayers. Everyone is welcome!
+                                                </p>
+                                                <a href="/Home/Events" class="btn btn-outline-primary btn-sm">
+                                                    <i class="fas fa-calendar me-1"></i>
+                                                    View Events
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Prayer Times -->
+                        <div class="col-md-6 mb-4">
+                            <div class="info-card h-100">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body p-4">
+                                        <div class="d-flex align-items-start">
+                                            <div class="icon-wrapper me-3">
+                                                <i class="fas fa-pray text-success" style="font-size: 2rem;"></i>
+                                            </div>
+                                            <div>
+                                                <h5 class="card-title text-success">Prayer Times</h5>
+                                                <p class="card-text text-muted">
+                                                    Join us for daily prayers and Friday Jummah. Check our current prayer schedule and never miss a congregation.
+                                                </p>
+                                                <a href="/Home/PrayerTimes" class="btn btn-outline-success btn-sm">
+                                                    <i class="fas fa-clock me-1"></i>
+                                                    Prayer Schedule
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="py-5" style="background: linear-gradient(135deg, #e8f5e8 0%, #f0f8f0 100%);">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 text-center">
+                    <h4 class="text-success mb-3">
+                        <i class="fas fa-question-circle me-2"></i>
+                        Have Questions?
+                    </h4>
+                    <p class="text-muted mb-4">
+                        If you have any questions about your membership application or our community, please don't hesitate to reach out.
+                    </p>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                        <a href="/Home/Contact" class="btn btn-success">
+                            <i class="fas fa-envelope me-1"></i>
+                            Contact Us
+                        </a>
+                        <a href="/" class="btn btn-outline-success">
+                            <i class="fas fa-home me-1"></i>
+                            Back to Home
+                        </a>
+                        <a href="/Membership/Status" class="btn btn-outline-secondary">
+                            <i class="fas fa-search me-1"></i>
+                            Check Status
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<style>
+    .success-hero {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .success-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('/images/islamic-pattern.png') repeat;
+        opacity: 0.05;
+        z-index: 0;
+    }
+    
+    .success-hero > .container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .icon-circle {
+        transition: transform 0.3s ease;
+    }
+    
+    .card:hover .icon-circle {
+        transform: scale(1.1);
+    }
+    
+    .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+    }
+    
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.75);
+    }
+    
+    @@media (max-width: 768px) {
+        .success-hero h1 {
+            font-size: 2rem !important;
+        }
+        
+        .success-hero h2 {
+            font-size: 1.25rem !important;
+        }
+        
+        .icon-circle {
+            width: 80px !important;
+            height: 80px !important;
+        }
+        
+        .icon-circle i {
+            font-size: 2.5rem !important;
+        }
+    }
+</style>

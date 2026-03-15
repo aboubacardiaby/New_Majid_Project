@@ -1,0 +1,132 @@
+@model IndividualContributorReport
+
+<div class="contributor-details">
+    <div class="row mb-3">
+        <div class="col-md-8">
+            <h6 class="mb-1">@Model.Summary.ContributorName</h6>
+            <small class="text-muted">@Model.Summary.Email</small>
+        </div>
+        <div class="col-md-4 text-end">
+            <span class="badge bg-primary">Rank #@Model.ContributorRank</span>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="detail-stat">
+                <div class="value text-success">$@Model.Summary.TotalAmount.ToString("N2")</div>
+                <div class="label">Total Contributed</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="detail-stat">
+                <div class="value text-info">@Model.Summary.ContributionCount</div>
+                <div class="label">Total Donations</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="detail-stat">
+                <div class="value text-warning">$@Model.Summary.AverageAmount.ToString("N2")</div>
+                <div class="label">Average Amount</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="detail-stat">
+                <div class="value text-primary">@((DateTime.Now - Model.Summary.FirstContribution).Days) days</div>
+                <div class="label">Member Since</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <h6>Period Totals</h6>
+            <ul class="list-unstyled">
+                <li><strong>This Week:</strong> $@Model.WeekToDateTotal.ToString("N2")</li>
+                <li><strong>This Month:</strong> $@Model.MonthToDateTotal.ToString("N2")</li>
+                <li><strong>This Year:</strong> $@Model.YearToDateTotal.ToString("N2")</li>
+            </ul>
+        </div>
+        <div class="col-md-8">
+            <h6>Recent Activity</h6>
+            @if (Model.Summary.Contributions.Any())
+            {
+                <div style="max-height: 200px; overflow-y: auto;">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Amount</th>
+                                <th>Project</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var contribution in Model.Summary.Contributions.Take(5))
+                            {
+                                <tr>
+                                    <td>@contribution.Date.ToString("MMM dd")</td>
+                                    <td class="text-success">$@contribution.Amount.ToString("N2")</td>
+                                    <td>@contribution.ProjectName</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="text-muted">No recent contributions</p>
+            }
+        </div>
+    </div>
+
+    <div class="modal-actions">
+        <a href="@Url.Action("Report", new { email = Model.Summary.Email })" 
+           target="_blank" 
+           class="btn btn-primary btn-sm">
+            <i class="fas fa-chart-line me-1"></i>
+            View Full Report
+        </a>
+        <a href="@Url.Action("ExportReport", new { email = Model.Summary.Email })" 
+           class="btn btn-outline-secondary btn-sm">
+            <i class="fas fa-download me-1"></i>
+            Export CSV
+        </a>
+    </div>
+</div>
+
+<style>
+.contributor-details {
+    padding: 10px 0;
+}
+
+.detail-stat {
+    text-align: center;
+    padding: 15px 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 15px;
+}
+
+.detail-stat .value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.detail-stat .label {
+    font-size: 0.85rem;
+    color: #666;
+    text-transform: uppercase;
+}
+
+.modal-actions {
+    border-top: 1px solid #e9ecef;
+    padding-top: 15px;
+    text-align: center;
+}
+
+.modal-actions .btn {
+    margin: 0 5px;
+}
+</style>

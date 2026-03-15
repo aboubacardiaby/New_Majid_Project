@@ -1,43 +1,38 @@
 document.addEventListener('DOMContentLoaded', function() {
-    // Mobile Navigation
-    const hamburger = document.getElementById('hamburger');
-    const navMenu = document.getElementById('nav-menu');
-    const navLinks = document.querySelectorAll('.nav-menu a');
+    // ── Mobile drawer navigation ─────────────────────────────────────────────
+    const hamburger   = document.getElementById('hamburger');
+    const navDrawer   = document.getElementById('navDrawer');
+    const navOverlay  = document.getElementById('navOverlay');
+    const drawerClose = document.getElementById('drawerClose');
 
-    if (hamburger && navMenu) {
-        hamburger.addEventListener('click', function() {
-            hamburger.classList.toggle('active');
-            navMenu.classList.toggle('active');
-        });
-
-        // Close mobile menu when clicking on a link or logout button
-        navLinks.forEach(link => {
-            link.addEventListener('click', function() {
-                hamburger.classList.remove('active');
-                navMenu.classList.remove('active');
-            });
-        });
-
-        // Close mobile menu when clicking logout button
-        const logoutButton = document.querySelector('.nav-logout-btn');
-        if (logoutButton) {
-            logoutButton.addEventListener('click', function() {
-                hamburger.classList.remove('active');
-                navMenu.classList.remove('active');
-            });
-        }
+    function openDrawer() {
+        navDrawer.classList.add('open');
+        navOverlay.classList.add('open');
+        hamburger.classList.add('open');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeDrawer() {
+        navDrawer.classList.remove('open');
+        navOverlay.classList.remove('open');
+        hamburger.classList.remove('open');
+        document.body.style.overflow = '';
     }
 
-    // Header scroll effect
-    window.addEventListener('scroll', function() {
-        const header = document.querySelector('header');
-        if (header) {
-            if (window.scrollY > 100) {
-                header.style.background = 'rgba(255, 255, 255, 0.98)';
-            } else {
-                header.style.background = 'rgba(255, 255, 255, 0.95)';
-            }
-        }
+    if (hamburger)   hamburger.addEventListener('click', openDrawer);
+    if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+    if (navOverlay)  navOverlay.addEventListener('click', closeDrawer);
+
+    // Close drawer on link click
+    if (navDrawer) {
+        navDrawer.querySelectorAll('a, button[type="submit"]').forEach(el => {
+            el.addEventListener('click', closeDrawer);
+        });
+    }
+
+    // ── Navbar scroll shadow ─────────────────────────────────────────────────
+    const mainNav = document.getElementById('mainNav');
+    window.addEventListener('scroll', function () {
+        if (mainNav) mainNav.classList.toggle('scrolled', window.scrollY > 40);
     });
 
     // Contact Form Enhancement

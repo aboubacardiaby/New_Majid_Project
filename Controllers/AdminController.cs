@@ -1,9 +1,9 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
 using GambianMuslimCommunity.Models;
 using GambianMuslimCommunity.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
 
 namespace GambianMuslimCommunity.Controllers
 {
@@ -11,11 +11,15 @@ namespace GambianMuslimCommunity.Controllers
     {
         private readonly IAdminService _adminService;
         private readonly ILogger<AdminController> _logger;
+        private readonly IContributionTrackerService _contributionService;
+        private readonly ICommunityService _communityService;
 
-        public AdminController(IAdminService adminService, ILogger<AdminController> logger)
+        public AdminController(IAdminService adminService, ILogger<AdminController> logger, IContributionTrackerService contributionService, ICommunityService communityService)
         {
             _adminService = adminService;
             _logger = logger;
+            _contributionService = contributionService;
+            _communityService = communityService;
         }
 
         [HttpGet]
@@ -36,7 +40,7 @@ namespace GambianMuslimCommunity.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(AdminLoginViewModel model)
+        public async Task<IActionResult> Login(AdminLoginViewModel model, string? returnUrl = null)
         {
             if (!ModelState.IsValid)
             {
@@ -197,7 +201,10 @@ namespace GambianMuslimCommunity.Controllers
                 ["State"] = (siteInfoModel.State, "Contact"),
                 ["ZipCode"] = (siteInfoModel.ZipCode, "Contact"),
                 ["LogoUrl"] = (siteInfoModel.LogoUrl, "General"),
-                ["ImamName"] = (siteInfoModel.ImamName, "General")
+                ["ImamName"] = (siteInfoModel.ImamName, "General"),
+                ["ImamWelcomeMessage"] = (siteInfoModel.ImamWelcomeMessage, "General"),
+                ["ImamImageUrl"] = (siteInfoModel.ImamImageUrl, "General"),
+                ["ImamTitle"] = (siteInfoModel.ImamTitle, "General")
             };
 
             var success = true;
@@ -859,6 +866,223 @@ namespace GambianMuslimCommunity.Controllers
             return View();
         }
 
+        #region Contribution Management
+
+        [Authorize]
+        public async Task<IActionResult> Contributions(ContributionFilterOptions? filters = null, int page = 1)
+        {
+            const int pageSize = 20;
+            
+            var contributors = await _contributionService.GetAllContributorsAsync(filters, page, pageSize);
+            var totalCount = await _contributionService.GetContributorsCountAsync(filters);
+            
+            var weeklyAnalytics = await _contributionService.GetWeeklyAnalyticsAsync();
+            var monthlyAnalytics = await _contributionService.GetMonthlyAnalyticsAsync();
+            var yearlyAnalytics = await _contributionService.GetYearlyAnalyticsAsync();
+
+            var model = new ContributionTrackerViewModel
+            {
+                Contributors = contributors,
+                WeeklyAnalytics = weeklyAnalytics,
+                MonthlyAnalytics = monthlyAnalytics,
+                YearlyAnalytics = yearlyAnalytics,
+                FilterOptions = filters ?? new ContributionFilterOptions(),
+                TotalContributors = totalCount,
+                PageNumber = page,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+            };
+
+            await UpdateSessionActivity();
+            return View(model);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> ContributionAnalytics(string period = "month")
+        {
+            ContributionAnalytics analytics = period.ToLower() switch
+            {
+                "week" => await _contributionService.GetWeeklyAnalyticsAsync(),
+                "year" => await _contributionService.GetYearlyAnalyticsAsync(),
+                _ => await _contributionService.GetMonthlyAnalyticsAsync()
+            };
+
+            return Json(analytics);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> TopContributors(string period = "month", int count = 10)
+        {
+            var topContributors = await _contributionService.GetTopContributorsAsync(period, count, false);
+            return Json(topContributors);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RecalculateContributionTrackers()
+        {
+            var success = await _contributionService.RecalculateContributionTrackersAsync();
+            
+            if (success)
+            {
+                var adminId = GetCurrentAdminId();
+                await _adminService.LogActivityAsync(adminId, "Recalculate Trackers", "ContributionTracker", null,
+                    "Recalculated all contribution trackers", HttpContext.Connection.RemoteIpAddress?.ToString());
+                    
+                TempData["SuccessMessage"] = "Contribution trackers have been recalculated successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Failed to recalculate contribution trackers.";
+            }
+
+            return RedirectToAction("Contributions");
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> ExportContributions([FromQuery] ContributionFilterOptions? filters = null)
+        {
+            var reportData = await _contributionService.ExportContributionReportAsync(filters);
+            var fileName = $"All_Contributors_Report_{DateTime.Now:yyyyMMdd_HHmmss}.csv";
+            
+            return File(reportData, "text/csv", fileName);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> ContributorDetails(string email)
+        {
+            if (string.IsNullOrEmpty(email))
+            {
+                return NotFound();
+            }
+
+            var report = await _contributionService.GetContributorReportAsync(email);
+            if (report.Summary == null || string.IsNullOrEmpty(report.Summary.Email))
+            {
+                return NotFound();
+            }
+
+            return PartialView("_ContributorDetailsPartial", report);
+        }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> AddContribution()
+        {
+            var model = new ManualContribution
+            {
+                ContributionDate = DateTime.Now,
+                AvailableProjects = await GetAvailableProjectsAsync(),
+                PaymentMethods = GetPaymentMethods()
+            };
+
+            return View(model);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddContribution(ManualContribution model)
+        {
+            if (ModelState.IsValid)
+            {
+                var success = await _contributionService.AddManualContributionAsync(
+                    model.ContributorName,
+                    model.Email,
+                    model.Amount,
+                    model.ProjectName,
+                    model.PaymentMethod,
+                    model.ContributionDate,
+                    model.Notes);
+
+                if (success)
+                {
+                    var adminId = GetCurrentAdminId();
+                    await _adminService.LogActivityAsync(adminId, "Add Manual Contribution", "MasjidDonation", null,
+                        $"Added manual contribution: ${model.Amount} from {model.ContributorName}", 
+                        HttpContext.Connection.RemoteIpAddress?.ToString());
+                        
+                    _logger.LogInformation("Manual contribution added: {Amount} from {Name} ({Email})", 
+                        model.Amount, model.ContributorName, model.Email);
+                    
+                    TempData["SuccessMessage"] = $"Manual contribution of ${model.Amount:F2} for {model.ContributorName} has been added successfully.";
+                    return RedirectToAction("Contributions");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Failed to add the contribution. Please try again.");
+                }
+            }
+
+            // Reload dropdown data if validation fails
+            model.AvailableProjects = await GetAvailableProjectsAsync();
+            model.PaymentMethods = GetPaymentMethods();
+            return View(model);
+        }
+
+        private async Task<List<string>> GetAvailableProjectsAsync()
+        {
+            try
+            {
+                var projects = await _communityService.GetActiveMasjidProjectsAsync();
+                var projectNames = projects?.Select(p => p.Title).ToList() ?? new List<string>();
+                
+                // Add common project names if no projects found or to supplement existing ones
+                var commonProjects = new List<string>
+                {
+                    "General Fund",
+                    "Masjid Construction",
+                    "Ramadan Support",
+                    "Education Fund",
+                    "Community Events",
+                    "Iftar Program",
+                    "Zakat Distribution",
+                    "Emergency Relief"
+                };
+
+                // Combine and remove duplicates
+                projectNames.AddRange(commonProjects);
+                return projectNames.Distinct().ToList();
+            }
+            catch
+            {
+                // Fallback to common project names if service call fails
+                return new List<string>
+                {
+                    "General Fund",
+                    "Masjid Construction",
+                    "Ramadan Support",
+                    "Education Fund",
+                    "Community Events",
+                    "Iftar Program",
+                    "Zakat Distribution",
+                    "Emergency Relief"
+                };
+            }
+        }
+
+        private List<string> GetPaymentMethods()
+        {
+            return new List<string>
+            {
+                "Cash",
+                "Check",
+                "Bank Transfer",
+                "Credit Card",
+                "PayPal",
+                "Zelle",
+                "Venmo",
+                "Other"
+            };
+        }
+
+        #endregion
+
         #region Helper Methods
 
         private async Task<AdminSettingsViewModel> LoadSettingsViewModel()
@@ -883,7 +1107,10 @@ namespace GambianMuslimCommunity.Controllers
                 State = settingsDict.GetValueOrDefault("Contact:State", ""),
                 ZipCode = settingsDict.GetValueOrDefault("Contact:ZipCode", ""),
                 LogoUrl = settingsDict.GetValueOrDefault("General:LogoUrl", ""),
-                ImamName = settingsDict.GetValueOrDefault("General:ImamName", "")
+                ImamName = settingsDict.GetValueOrDefault("General:ImamName", ""),
+                ImamWelcomeMessage = settingsDict.GetValueOrDefault("General:ImamWelcomeMessage", ""),
+                ImamImageUrl = settingsDict.GetValueOrDefault("General:ImamImageUrl", ""),
+                ImamTitle = settingsDict.GetValueOrDefault("General:ImamTitle", "")
             };
 
             model.SocialMedia = new SocialMediaSettings

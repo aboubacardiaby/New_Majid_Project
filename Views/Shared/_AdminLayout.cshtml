@@ -215,6 +215,18 @@
                     </a>
                 </li>
                 <li>
+                    <a href="@Url.Action("Contributions", "Admin")" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Contributions" || ViewContext.RouteData.Values["Action"]?.ToString() == "AddContribution" ? "active" : "")">
+                        <i class="fas fa-chart-line"></i>
+                        Contributions
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index", "AdminMembers")" class="@(ViewContext.RouteData.Values["Controller"]?.ToString() == "AdminMembers" ? "active" : "")">
+                        <i class="fas fa-users"></i>
+                        Members
+                    </a>
+                </li>
+                <li>
                     <a href="@Url.Action("Settings", "Admin")" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Settings" ? "active" : "")">
                         <i class="fas fa-cog"></i>
                         Settings

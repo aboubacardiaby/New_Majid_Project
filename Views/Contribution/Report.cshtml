@@ -1,0 +1,372 @@
+@model IndividualContributorReport
+@{
+    ViewData["Title"] = "Your Contribution Report";
+}
+
+<div class="contribution-report">
+    <div class="container-fluid">
+        <!-- Header Section -->
+        <div class="report-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1>
+                            <i class="fas fa-user-circle me-3"></i>
+                            @Model.Summary.ContributorName
+                        </h1>
+                        <p class="lead">@Model.Summary.Email</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <a href="@Url.Action("ExportReport", new { email = Model.Summary.Email })" 
+                           class="btn btn-outline-light">
+                            <i class="fas fa-download me-2"></i>
+                            Export Report
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card primary">
+                        <div class="stat-icon">
+                            <i class="fas fa-hand-holding-usd"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>$@Model.Summary.TotalAmount.ToString("N2")</h3>
+                            <p>Total Contributions</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card success">
+                        <div class="stat-icon">
+                            <i class="fas fa-list-ol"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>@Model.Summary.ContributionCount</h3>
+                            <p>Total Donations</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card info">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>$@Model.Summary.AverageAmount.ToString("N2")</h3>
+                            <p>Average Donation</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="stat-card warning">
+                        <div class="stat-icon">
+                            <i class="fas fa-trophy"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3>@Model.ContributorRank</h3>
+                            <p>Community Rank</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Period Totals -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="period-card">
+                        <h5>Year to Date</h5>
+                        <div class="amount">$@Model.YearToDateTotal.ToString("N2")</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="period-card">
+                        <h5>Month to Date</h5>
+                        <div class="amount">$@Model.MonthToDateTotal.ToString("N2")</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="period-card">
+                        <h5>Week to Date</h5>
+                        <div class="amount">$@Model.WeekToDateTotal.ToString("N2")</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="row mb-4">
+                <div class="col-lg-8">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-chart-line me-2"></i>Monthly Contribution Trends</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="monthlyTrendsChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-project-diagram me-2"></i>Project Breakdown</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas id="projectBreakdownChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Contributions -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="contributions-card">
+                        <div class="card-header">
+                            <h5><i class="fas fa-history me-2"></i>Recent Contributions</h5>
+                        </div>
+                        <div class="card-body">
+                            @if (Model.Summary.Contributions.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Date</th>
+                                                <th>Amount</th>
+                                                <th>Project</th>
+                                                <th>Payment Method</th>
+                                                <th>Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var contribution in Model.Summary.Contributions.Take(10))
+                                            {
+                                                <tr>
+                                                    <td>@contribution.Date.ToString("MMM dd, yyyy")</td>
+                                                    <td class="fw-bold text-success">$@contribution.Amount.ToString("N2")</td>
+                                                    <td>@contribution.ProjectName</td>
+                                                    <td>@contribution.PaymentMethod</td>
+                                                    <td>
+                                                        <span class="badge @(contribution.PaymentStatus == "Completed" ? "bg-success" : "bg-warning")">
+                                                            @contribution.PaymentStatus
+                                                        </span>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                                @if (Model.Summary.Contributions.Count > 10)
+                                {
+                                    <div class="text-center mt-3">
+                                        <small class="text-muted">Showing 10 of @Model.Summary.Contributions.Count contributions</small>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="text-center py-4">
+                                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                    <p class="text-muted">No contributions found</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.contribution-report {
+    background: #f8f9fa;
+    min-height: 100vh;
+}
+
+.report-header {
+    background: linear-gradient(135deg, var(--primary-color), #1a3d1e);
+    color: white;
+    padding: 60px 0 40px;
+    margin-bottom: 40px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    border-left: 4px solid;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.stat-card.primary { border-left-color: #4e73df; }
+.stat-card.success { border-left-color: #1cc88a; }
+.stat-card.info { border-left-color: #36b9cc; }
+.stat-card.warning { border-left-color: #f6c23e; }
+
+.stat-icon {
+    font-size: 2.5rem;
+    margin-right: 20px;
+    opacity: 0.7;
+}
+
+.stat-card.primary .stat-icon { color: #4e73df; }
+.stat-card.success .stat-icon { color: #1cc88a; }
+.stat-card.info .stat-icon { color: #36b9cc; }
+.stat-card.warning .stat-icon { color: #f6c23e; }
+
+.stat-content h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0;
+    color: #333;
+}
+
+.stat-content p {
+    margin: 0;
+    color: #666;
+    font-weight: 500;
+}
+
+.period-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    height: 100%;
+}
+
+.period-card h5 {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.period-card .amount {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.chart-card, .contributions-card {
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    border: none;
+}
+
+.card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #e3e6f0;
+    padding: 20px 25px;
+    border-radius: 10px 10px 0 0;
+}
+
+.card-body {
+    padding: 25px;
+}
+
+.table th {
+    border-top: none;
+    color: #666;
+    font-weight: 600;
+}
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Monthly Trends Chart
+        const monthlyData = @Html.Raw(Json.Serialize(Model.MonthlyTrends.Select(mt => new { 
+            period = mt.Period, 
+            amount = mt.TotalAmount, 
+            count = mt.ContributionCount 
+        })));
+
+        const ctx1 = document.getElementById('monthlyTrendsChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: monthlyData.map(d => d.period),
+                datasets: [{
+                    label: 'Monthly Contributions ($)',
+                    data: monthlyData.map(d => d.amount),
+                    borderColor: '#4e73df',
+                    backgroundColor: 'rgba(78, 115, 223, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Amount: $' + context.parsed.y.toLocaleString();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Project Breakdown Chart
+        const projectData = @Html.Raw(Json.Serialize(Model.ProjectBreakdown.Take(5).Select(pb => new { 
+            name = pb.ProjectName, 
+            amount = pb.TotalAmount 
+        })));
+
+        const ctx2 = document.getElementById('projectBreakdownChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'doughnut',
+            data: {
+                labels: projectData.map(d => d.name),
+                datasets: [{
+                    data: projectData.map(d => d.amount),
+                    backgroundColor: [
+                        '#4e73df',
+                        '#1cc88a', 
+                        '#36b9cc',
+                        '#f6c23e',
+                        '#e74a3b'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const total = projectData.reduce((sum, d) => sum + d.amount, 0);
+                                const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                return context.label + ': $' + context.parsed.toLocaleString() + ' (' + percentage + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+}

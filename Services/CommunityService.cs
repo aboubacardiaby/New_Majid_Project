@@ -95,6 +95,26 @@ namespace GambianMuslimCommunity.Services
             }
         }
 
+        public async Task<ImamWelcomeMessage> GetImamWelcomeMessageAsync()
+        {
+            var settings = await _context.SiteSettings
+                .Where(s => s.IsActive && s.Category == "General" && 
+                       (s.SettingKey == "ImamName" || s.SettingKey == "ImamWelcomeMessage" || 
+                        s.SettingKey == "ImamImageUrl" || s.SettingKey == "ImamTitle"))
+                .ToListAsync();
+
+            var settingsDict = settings.ToDictionary(s => s.SettingKey, s => s.SettingValue);
+
+            return new ImamWelcomeMessage
+            {
+                ImamName = settingsDict.GetValueOrDefault("ImamName", "Imam Abdullah Jallow"),
+                WelcomeMessage = settingsDict.GetValueOrDefault("ImamWelcomeMessage", 
+                    "Assalamu Alaikum wa Rahmatullahi wa Barakatuh, dear brothers and sisters. Welcome to our vibrant Gambian Muslim Community in Minnesota."),
+                ImamImageUrl = settingsDict.GetValueOrDefault("ImamImageUrl", "/images/imam-placeholder.jpg"),
+                ImamTitle = settingsDict.GetValueOrDefault("ImamTitle", "Community Imam & Spiritual Leader")
+            };
+        }
+
         public async Task<MasjidProject?> GetFeaturedMasjidProjectAsync()
         {
             try
@@ -186,6 +206,18 @@ namespace GambianMuslimCommunity.Services
             catch
             {
                 return false;
+            }
+        }
+
+        public async Task<MasjidDonation?> GetDonationByIdAsync(int id)
+        {
+            try
+            {
+                return await _context.MasjidDonations.FindAsync(id);
+            }
+            catch
+            {
+                return null;
             }
         }
 

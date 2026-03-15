@@ -1,0 +1,315 @@
+@model ContributionTrackerViewModel
+@{
+    ViewData["Title"] = "Contribution Analytics";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12">
+        <!-- Analytics Cards -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card primary">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-value">$@Model.WeeklyAnalytics.TotalAmount.ToString("N0")</div>
+                            <div class="stats-label">Weekly Total</div>
+                            <div class="stats-sublabel">@Model.WeeklyAnalytics.ContributionCount contributions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card success">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-value">$@Model.MonthlyAnalytics.TotalAmount.ToString("N0")</div>
+                            <div class="stats-label">Monthly Total</div>
+                            <div class="stats-sublabel">@Model.MonthlyAnalytics.ContributionCount contributions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card info">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-value">$@Model.YearlyAnalytics.TotalAmount.ToString("N0")</div>
+                            <div class="stats-label">Yearly Total</div>
+                            <div class="stats-sublabel">@Model.YearlyAnalytics.ContributionCount contributions</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="stats-card warning">
+                    <div class="d-flex align-items-center">
+                        <div class="stats-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stats-content">
+                            <div class="stats-value">@Model.TotalContributors</div>
+                            <div class="stats-label">Total Contributors</div>
+                            <div class="stats-sublabel">@Model.MonthlyAnalytics.UniqueContributors this month</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters and Actions -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-filter me-2"></i>
+                    Contribution Tracking & Analytics
+                </h5>
+                <div class="btn-group">
+                    <a href="@Url.Action("AddContribution")" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>
+                        Add Contribution
+                    </a>
+                    <button type="button" class="btn btn-outline-primary" onclick="recalculateTrackers()">
+                        <i class="fas fa-sync me-1"></i>
+                        Recalculate
+                    </button>
+                    <a href="@Url.Action("ExportContributions")" class="btn btn-success">
+                        <i class="fas fa-download me-1"></i>
+                        Export All
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="get" asp-action="Contributions">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Search</label>
+                                <input asp-for="FilterOptions.SearchTerm" class="form-control" placeholder="Name or email..." />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Min Amount</label>
+                                <input asp-for="FilterOptions.MinAmount" type="number" step="0.01" class="form-control" placeholder="$0" />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Max Amount</label>
+                                <input asp-for="FilterOptions.MaxAmount" type="number" step="0.01" class="form-control" placeholder="$999999" />
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Sort By</label>
+                                <select asp-for="FilterOptions.SortBy" class="form-select">
+                                    <option value="amount">Total Amount</option>
+                                    <option value="count">Contribution Count</option>
+                                    <option value="date">Last Contribution</option>
+                                    <option value="name">Name</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group mb-3">
+                                <label class="form-label">Order</label>
+                                <select asp-for="FilterOptions.SortOrder" class="form-select">
+                                    <option value="desc">Descending</option>
+                                    <option value="asc">Ascending</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <div class="form-group mb-3">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Contributors Table -->
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">
+                    <i class="fas fa-list me-2"></i>
+                    Contributors (@Model.TotalContributors total)
+                </h6>
+            </div>
+            <div class="card-body">
+                @if (Model.Contributors.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Contributor</th>
+                                    <th>Total Amount</th>
+                                    <th>Count</th>
+                                    <th>Average</th>
+                                    <th>First Contribution</th>
+                                    <th>Last Contribution</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var contributor in Model.Contributors)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div>
+                                                <strong>@contributor.ContributorName</strong>
+                                                <br><small class="text-muted">@contributor.Email</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="fw-bold text-success">$@contributor.TotalAmount.ToString("N2")</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info">@contributor.ContributionCount</span>
+                                        </td>
+                                        <td>$@contributor.AverageAmount.ToString("N2")</td>
+                                        <td>@contributor.FirstContribution.ToString("MMM dd, yyyy")</td>
+                                        <td>@contributor.LastContribution.ToString("MMM dd, yyyy")</td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button type="button" class="btn btn-outline-info view-details" 
+                                                        data-email="@contributor.Email"
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#contributorModal">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <a href="@Url.Action("Report", new { email = contributor.Email })" 
+                                                   target="_blank"
+                                                   class="btn btn-outline-primary">
+                                                    <i class="fas fa-chart-line"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    @if (Model.TotalPages > 1)
+                    {
+                        <nav class="mt-4">
+                            <ul class="pagination justify-content-center">
+                                @if (Model.PageNumber > 1)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="@Url.Action("Contributions", new { page = Model.PageNumber - 1 })">Previous</a>
+                                    </li>
+                                }
+                                
+                                @for (int i = Math.Max(1, Model.PageNumber - 2); i <= Math.Min(Model.TotalPages, Model.PageNumber + 2); i++)
+                                {
+                                    <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                                        <a class="page-link" href="@Url.Action("Contributions", new { page = i })">@i</a>
+                                    </li>
+                                }
+                                
+                                @if (Model.PageNumber < Model.TotalPages)
+                                {
+                                    <li class="page-item">
+                                        <a class="page-link" href="@Url.Action("Contributions", new { page = Model.PageNumber + 1 })">Next</a>
+                                    </li>
+                                }
+                            </ul>
+                        </nav>
+                    }
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No contributors found</h5>
+                        <p class="text-muted">Contributors will appear here once donations are made and processed.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Contributor Details Modal -->
+<div class="modal fade" id="contributorModal" tabindex="-1" aria-labelledby="contributorModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="contributorModalLabel">
+                    <i class="fas fa-user-circle me-2"></i>
+                    Contributor Details
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="contributorDetailsContent">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // View contributor details
+            $('.view-details').on('click', function() {
+                const email = $(this).data('email');
+                
+                $.get('@Url.Action("ContributorDetails")', { email: email })
+                    .done(function(data) {
+                        $('#contributorDetailsContent').html(data);
+                    })
+                    .fail(function() {
+                        $('#contributorDetailsContent').html('<div class="alert alert-danger">Failed to load contributor details</div>');
+                    });
+            });
+        });
+
+        function recalculateTrackers() {
+            if (confirm('This will recalculate all contribution trackers. Continue?')) {
+                $.post('@Url.Action("RecalculateContributionTrackers")')
+                    .done(function() {
+                        showAlert('Contribution trackers recalculated successfully!', 'success');
+                        setTimeout(() => location.reload(), 1500);
+                    })
+                    .fail(function() {
+                        showAlert('Failed to recalculate trackers', 'error');
+                    });
+            }
+        }
+
+        function showAlert(message, type) {
+            const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+            const alertHtml = `
+                <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+            
+            $('.card-body').first().prepend(alertHtml);
+            
+            setTimeout(function() {
+                $('.alert').fadeOut();
+            }, 5000);
+        }
+    </script>
+}

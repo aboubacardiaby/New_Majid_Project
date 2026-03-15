@@ -1,0 +1,736 @@
+@model GambianMuslimCommunity.Models.Member
+@{
+    ViewData["Title"] = $"Member Details - {Model.FullName}";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">
+        <i class="fas fa-user text-primary me-2"></i>
+        Member Details
+    </h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="/AdminMembers/Edit/@Model.Id" class="btn btn-outline-primary">
+                <i class="fas fa-edit me-1"></i>
+                Edit Member
+            </a>
+            <a href="/AdminMembers" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i>
+                Back to List
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Member Information Card -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="card-title mb-0">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-circle me-3">
+                                    @Model.FullName.FirstOrDefault()
+                                </div>
+                                <div>
+                                    <div class="h5 mb-1">@Model.FullName</div>
+                                    <small class="text-muted">Member ID: @Model.Id</small>
+                                </div>
+                            </div>
+                        </h5>
+                    </div>
+                    <div class="col-auto">
+                        @switch (Model.MembershipStatus)
+                        {
+                            case "Pending":
+                                <span class="badge bg-warning fs-6 px-3 py-2">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Pending Review
+                                </span>
+                                break;
+                            case "Active":
+                                <span class="badge bg-success fs-6 px-3 py-2">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    Active Member
+                                </span>
+                                break;
+                            case "Suspended":
+                                <span class="badge bg-danger fs-6 px-3 py-2">
+                                    <i class="fas fa-pause-circle me-1"></i>
+                                    Suspended
+                                </span>
+                                break;
+                            case "Rejected":
+                                <span class="badge bg-secondary fs-6 px-3 py-2">
+                                    <i class="fas fa-times-circle me-1"></i>
+                                    Rejected
+                                </span>
+                                break;
+                            default:
+                                <span class="badge bg-light text-dark fs-6 px-3 py-2">@Model.MembershipStatus</span>
+                                break;
+                        }
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-body">
+                <!-- Personal Information -->
+                <div class="section-header mb-3">
+                    <h6 class="text-primary border-bottom border-primary pb-2">
+                        <i class="fas fa-user me-2"></i>
+                        Personal Information
+                    </h6>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <label class="form-label text-muted small fw-bold">Email Address</label>
+                            <div class="fw-medium">
+                                <i class="fas fa-envelope me-2 text-muted"></i>
+                                <a href="mailto:@Model.Email" class="text-decoration-none">@Model.Email</a>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item mb-3">
+                            <label class="form-label text-muted small fw-bold">Phone Number</label>
+                            <div class="fw-medium">
+                                <i class="fas fa-phone me-2 text-muted"></i>
+                                <a href="tel:@Model.PhoneNumber" class="text-decoration-none">@Model.PhoneNumber</a>
+                            </div>
+                        </div>
+                        
+                        <div class="info-item mb-3">
+                            <label class="form-label text-muted small fw-bold">Date of Birth</label>
+                            <div class="fw-medium">
+                                <i class="fas fa-birthday-cake me-2 text-muted"></i>
+                                @Model.DateOfBirth.ToString("MMMM dd, yyyy")
+                                <small class="text-muted">(@((DateTime.Now.Year - Model.DateOfBirth.Year)) years old)</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <label class="form-label text-muted small fw-bold">Gender</label>
+                            <div class="fw-medium">
+                                <i class="fas fa-venus-mars me-2 text-muted"></i>
+                                @Model.Gender
+                            </div>
+                        </div>
+                        
+                        <div class="info-item mb-3">
+                            <label class="form-label text-muted small fw-bold">Marital Status</label>
+                            <div class="fw-medium">
+                                <i class="fas fa-heart me-2 text-muted"></i>
+                                @(string.IsNullOrEmpty(Model.MaritalStatus) ? "Not specified" : Model.MaritalStatus)
+                            </div>
+                        </div>
+                        
+                        <div class="info-item mb-3">
+                            <label class="form-label text-muted small fw-bold">Nationality</label>
+                            <div class="fw-medium">
+                                <i class="fas fa-flag me-2 text-muted"></i>
+                                @(string.IsNullOrEmpty(Model.Nationality) ? "Not specified" : Model.Nationality)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Professional Information -->
+                @if (!string.IsNullOrEmpty(Model.Profession))
+                {
+                    <div class="section-header mb-3">
+                        <h6 class="text-primary border-bottom border-primary pb-2">
+                            <i class="fas fa-briefcase me-2"></i>
+                            Professional Information
+                        </h6>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="info-item">
+                                <label class="form-label text-muted small fw-bold">Profession/Occupation</label>
+                                <div class="fw-medium">
+                                    <i class="fas fa-briefcase me-2 text-muted"></i>
+                                    @Model.Profession
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Address Information -->
+                <div class="section-header mb-3">
+                    <h6 class="text-primary border-bottom border-primary pb-2">
+                        <i class="fas fa-map-marker-alt me-2"></i>
+                        Address Information
+                    </h6>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        @if (!string.IsNullOrEmpty(Model.Address))
+                        {
+                            <div class="info-item mb-3">
+                                <label class="form-label text-muted small fw-bold">Street Address</label>
+                                <div class="fw-medium">
+                                    <i class="fas fa-home me-2 text-muted"></i>
+                                    @Model.Address
+                                </div>
+                            </div>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.City))
+                        {
+                            <div class="info-item mb-3">
+                                <label class="form-label text-muted small fw-bold">City</label>
+                                <div class="fw-medium">@Model.City</div>
+                            </div>
+                        }
+                    </div>
+                    
+                    <div class="col-md-6">
+                        @if (!string.IsNullOrEmpty(Model.State))
+                        {
+                            <div class="info-item mb-3">
+                                <label class="form-label text-muted small fw-bold">State/Province</label>
+                                <div class="fw-medium">@Model.State</div>
+                            </div>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.PostalCode))
+                        {
+                            <div class="info-item mb-3">
+                                <label class="form-label text-muted small fw-bold">Postal Code</label>
+                                <div class="fw-medium">@Model.PostalCode</div>
+                            </div>
+                        }
+                        
+                        @if (!string.IsNullOrEmpty(Model.Country))
+                        {
+                            <div class="info-item mb-3">
+                                <label class="form-label text-muted small fw-bold">Country</label>
+                                <div class="fw-medium">
+                                    <i class="fas fa-globe me-2 text-muted"></i>
+                                    @Model.Country
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Emergency Contact -->
+                @if (!string.IsNullOrEmpty(Model.EmergencyContactName) || !string.IsNullOrEmpty(Model.EmergencyContactPhone))
+                {
+                    <div class="section-header mb-3">
+                        <h6 class="text-primary border-bottom border-primary pb-2">
+                            <i class="fas fa-phone me-2"></i>
+                            Emergency Contact
+                        </h6>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            @if (!string.IsNullOrEmpty(Model.EmergencyContactName))
+                            {
+                                <div class="info-item mb-3">
+                                    <label class="form-label text-muted small fw-bold">Contact Name</label>
+                                    <div class="fw-medium">@Model.EmergencyContactName</div>
+                                </div>
+                            }
+                        </div>
+                        
+                        <div class="col-md-6">
+                            @if (!string.IsNullOrEmpty(Model.EmergencyContactPhone))
+                            {
+                                <div class="info-item mb-3">
+                                    <label class="form-label text-muted small fw-bold">Contact Phone</label>
+                                    <div class="fw-medium">
+                                        <a href="tel:@Model.EmergencyContactPhone" class="text-decoration-none">@Model.EmergencyContactPhone</a>
+                                    </div>
+                                </div>
+                            }
+                            
+                            @if (!string.IsNullOrEmpty(Model.EmergencyContactRelationship))
+                            {
+                                <div class="info-item mb-3">
+                                    <label class="form-label text-muted small fw-bold">Relationship</label>
+                                    <div class="fw-medium">@Model.EmergencyContactRelationship</div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- Communication Preferences -->
+                <div class="section-header mb-3">
+                    <h6 class="text-primary border-bottom border-primary pb-2">
+                        <i class="fas fa-cog me-2"></i>
+                        Communication Preferences
+                    </h6>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <label class="form-label text-muted small fw-bold">Email Notifications</label>
+                            <div class="fw-medium">
+                                @if (Model.ReceiveEmailNotifications)
+                                {
+                                    <span class="text-success">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        Enabled
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        <i class="fas fa-times-circle me-1"></i>
+                                        Disabled
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        
+                        <div class="info-item mb-3">
+                            <label class="form-label text-muted small fw-bold">SMS Notifications</label>
+                            <div class="fw-medium">
+                                @if (Model.ReceiveSmsNotifications)
+                                {
+                                    <span class="text-success">
+                                        <i class="fas fa-check-circle me-1"></i>
+                                        Enabled
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        <i class="fas fa-times-circle me-1"></i>
+                                        Disabled
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="info-item mb-3">
+                            <label class="form-label text-muted small fw-bold">Preferred Language</label>
+                            <div class="fw-medium">
+                                <i class="fas fa-language me-2 text-muted"></i>
+                                @Model.PreferredLanguage
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Notes -->
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <div class="section-header mb-3">
+                        <h6 class="text-primary border-bottom border-primary pb-2">
+                            <i class="fas fa-comment me-2"></i>
+                            Additional Notes
+                        </h6>
+                    </div>
+                    
+                    <div class="bg-light p-3 rounded mb-4">
+                        @Html.Raw(Html.Encode(Model.Notes).Replace("\n", "<br/>"))
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+    
+    <!-- Side Panel -->
+    <div class="col-lg-4">
+        <!-- Status Card -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2 text-primary"></i>
+                    Membership Status
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-bold">Current Status</label>
+                    <div class="fw-medium">
+                        @switch (Model.MembershipStatus)
+                        {
+                            case "Pending":
+                                <span class="badge bg-warning">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Pending Review
+                                </span>
+                                break;
+                            case "Active":
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    Active Member
+                                </span>
+                                break;
+                            case "Suspended":
+                                <span class="badge bg-danger">
+                                    <i class="fas fa-pause-circle me-1"></i>
+                                    Suspended
+                                </span>
+                                break;
+                            case "Rejected":
+                                <span class="badge bg-secondary">
+                                    <i class="fas fa-times-circle me-1"></i>
+                                    Rejected
+                                </span>
+                                break;
+                            default:
+                                <span class="badge bg-light text-dark">@Model.MembershipStatus</span>
+                                break;
+                        }
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label text-muted small fw-bold">Registration Date</label>
+                    <div class="fw-medium">@Model.RegistrationDate.ToString("MMMM dd, yyyy 'at' h:mm tt")</div>
+                </div>
+                
+                @if (Model.ApprovedDate.HasValue)
+                {
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Approved Date</label>
+                        <div class="fw-medium text-success">@Model.ApprovedDate.Value.ToString("MMMM dd, yyyy 'at' h:mm tt")</div>
+                    </div>
+                }
+                
+                @if (Model.ApprovedBy != null)
+                {
+                    <div class="mb-3">
+                        <label class="form-label text-muted small fw-bold">Approved By</label>
+                        <div class="fw-medium">@Model.ApprovedBy.FullName</div>
+                    </div>
+                }
+                
+                <div class="mb-0">
+                    <label class="form-label text-muted small fw-bold">Account Status</label>
+                    <div class="fw-medium">
+                        @if (Model.IsActive)
+                        {
+                            <span class="text-success">
+                                <i class="fas fa-check-circle me-1"></i>
+                                Active Account
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-warning">
+                                <i class="fas fa-exclamation-circle me-1"></i>
+                                Inactive Account
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions Card -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-bottom">
+                <h6 class="card-title mb-0">
+                    <i class="fas fa-cog me-2 text-primary"></i>
+                    Quick Actions
+                </h6>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    @if (Model.MembershipStatus == "Pending")
+                    {
+                        <button type="button" class="btn btn-success btn-sm" 
+                                onclick="performAction(@Model.Id, 'approve', '@Model.FullName')">
+                            <i class="fas fa-check me-1"></i>
+                            Approve Member
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" 
+                                onclick="performActionWithReason(@Model.Id, 'reject', '@Model.FullName')">
+                            <i class="fas fa-times me-1"></i>
+                            Reject Application
+                        </button>
+                    }
+                    @if (Model.MembershipStatus == "Active")
+                    {
+                        <button type="button" class="btn btn-warning btn-sm" 
+                                onclick="performActionWithReason(@Model.Id, 'suspend', '@Model.FullName')">
+                            <i class="fas fa-pause me-1"></i>
+                            Suspend Member
+                        </button>
+                    }
+                    @if (Model.MembershipStatus == "Suspended" || Model.MembershipStatus == "Rejected")
+                    {
+                        <button type="button" class="btn btn-success btn-sm" 
+                                onclick="performAction(@Model.Id, 'reactivate', '@Model.FullName')">
+                            <i class="fas fa-play me-1"></i>
+                            Reactivate Member
+                        </button>
+                    }
+                    
+                    <hr class="my-2">
+                    
+                    <a href="/AdminMembers/Edit/@Model.Id" class="btn btn-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i>
+                        Edit Information
+                    </a>
+                    
+                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                            onclick="confirmDelete(@Model.Id, '@Model.FullName')">
+                        <i class="fas fa-trash me-1"></i>
+                        Delete Member
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Activity Log -->
+        @if (Model.ActivityLogs.Any())
+        {
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-white border-bottom">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-history me-2 text-primary"></i>
+                        Recent Activity
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        @foreach (var activity in Model.ActivityLogs.OrderByDescending(a => a.ActivityDate).Take(10))
+                        {
+                            <div class="list-group-item border-0 py-3">
+                                <div class="d-flex align-items-start">
+                                    <div class="activity-icon me-3 mt-1">
+                                        @switch (activity.Action)
+                                        {
+                                            case "Registration":
+                                                <i class="fas fa-user-plus text-primary"></i>
+                                                break;
+                                            case "Approved":
+                                                <i class="fas fa-check-circle text-success"></i>
+                                                break;
+                                            case "Rejected":
+                                                <i class="fas fa-times-circle text-danger"></i>
+                                                break;
+                                            case "Suspended":
+                                                <i class="fas fa-pause-circle text-warning"></i>
+                                                break;
+                                            case "Reactivated":
+                                                <i class="fas fa-play-circle text-success"></i>
+                                                break;
+                                            case "Updated":
+                                                <i class="fas fa-edit text-info"></i>
+                                                break;
+                                            default:
+                                                <i class="fas fa-circle text-muted"></i>
+                                                break;
+                                        }
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-medium">@activity.Action</div>
+                                        @if (!string.IsNullOrEmpty(activity.Description))
+                                        {
+                                            <div class="text-muted small">@activity.Description</div>
+                                        }
+                                        <div class="text-muted small">
+                                            @activity.ActivityDate.ToString("MMM dd, yyyy 'at' h:mm tt")
+                                            @if (activity.AdminUser != null)
+                                            {
+                                                <span class="text-primary"> • by @activity.AdminUser.FullName</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Action Modal -->
+<div class="modal fade" id="actionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="actionModalTitle">Confirm Action</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p id="actionModalMessage"></p>
+                <div id="reasonSection" style="display: none;">
+                    <label for="actionReason" class="form-label">Reason (optional):</label>
+                    <textarea id="actionReason" class="form-control" rows="3" placeholder="Enter reason for this action..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" id="confirmActionBtn" class="btn btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentMemberId = 0;
+        let currentAction = '';
+
+        function performAction(memberId, action, memberName) {
+            currentMemberId = memberId;
+            currentAction = action;
+            
+            const actionText = action.charAt(0).toUpperCase() + action.slice(1);
+            document.getElementById('actionModalTitle').textContent = `${actionText} Member`;
+            document.getElementById('actionModalMessage').innerHTML = 
+                `Are you sure you want to <strong>${action}</strong> the member <strong>${memberName}</strong>?`;
+            
+            document.getElementById('reasonSection').style.display = 'none';
+            document.getElementById('actionReason').value = '';
+            
+            const confirmBtn = document.getElementById('confirmActionBtn');
+            confirmBtn.className = `btn btn-${getButtonClass(action)}`;
+            confirmBtn.textContent = `${actionText}`;
+            
+            new bootstrap.Modal(document.getElementById('actionModal')).show();
+        }
+
+        function performActionWithReason(memberId, action, memberName) {
+            currentMemberId = memberId;
+            currentAction = action;
+            
+            const actionText = action.charAt(0).toUpperCase() + action.slice(1);
+            document.getElementById('actionModalTitle').textContent = `${actionText} Member`;
+            document.getElementById('actionModalMessage').innerHTML = 
+                `Are you sure you want to <strong>${action}</strong> the member <strong>${memberName}</strong>?`;
+            
+            document.getElementById('reasonSection').style.display = 'block';
+            document.getElementById('actionReason').value = '';
+            
+            const confirmBtn = document.getElementById('confirmActionBtn');
+            confirmBtn.className = `btn btn-${getButtonClass(action)}`;
+            confirmBtn.textContent = `${actionText}`;
+            
+            new bootstrap.Modal(document.getElementById('actionModal')).show();
+        }
+
+        function confirmDelete(memberId, memberName) {
+            if (confirm(`Are you sure you want to permanently delete the member "${memberName}"? This action cannot be undone.`)) {
+                submitAction(memberId, 'delete');
+            }
+        }
+
+        function getButtonClass(action) {
+            switch(action) {
+                case 'approve':
+                case 'reactivate':
+                    return 'success';
+                case 'suspend':
+                    return 'warning';
+                case 'reject':
+                case 'delete':
+                    return 'danger';
+                default:
+                    return 'primary';
+            }
+        }
+
+        document.getElementById('confirmActionBtn').addEventListener('click', function() {
+            const reason = document.getElementById('actionReason').value;
+            submitAction(currentMemberId, currentAction, reason);
+        });
+
+        function submitAction(memberId, action, reason = '') {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/AdminMembers/${action.charAt(0).toUpperCase() + action.slice(1)}`;
+            
+            // Add anti-forgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (token) {
+                const tokenInput = document.createElement('input');
+                tokenInput.type = 'hidden';
+                tokenInput.name = '__RequestVerificationToken';
+                tokenInput.value = token.value;
+                form.appendChild(tokenInput);
+            }
+            
+            // Add member ID
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'id';
+            idInput.value = memberId;
+            form.appendChild(idInput);
+            
+            // Add reason if provided
+            if (reason) {
+                const reasonInput = document.createElement('input');
+                reasonInput.type = 'hidden';
+                reasonInput.name = 'reason';
+                reasonInput.value = reason;
+                form.appendChild(reasonInput);
+            }
+            
+            document.body.appendChild(form);
+            form.submit();
+        }
+    </script>
+
+    @Html.AntiForgeryToken()
+    
+    <style>
+        .avatar-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        
+        .info-item {
+            border-left: 3px solid #f8f9fa;
+            padding-left: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .info-item:hover {
+            border-left-color: #007bff;
+        }
+        
+        .section-header h6 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .activity-icon {
+            width: 24px;
+            text-align: center;
+        }
+        
+        .card {
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+        
+        .list-group-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+}

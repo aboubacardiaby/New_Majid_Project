@@ -25,16 +25,16 @@ namespace GambianMuslimCommunity.Services
                     .FirstOrDefaultAsync(a => a.Username == username && a.IsActive);
 
                 admin.LastLoginDate = DateTime.Now;
-              
-                return admin;
-                //if (admin != null && BCrypt.Net.BCrypt.Verify(password, admin.PasswordHash))
-                //{
-                //    admin.LastLoginDate = DateTime.Now;
-                //    await _context.SaveChangesAsync();
-                //    return admin;
-                //}
-                
-              //  return null;
+              //  string passwordHash = BCrypt.Net.BCrypt.HashPassword(password);
+                //return admin;
+                if (admin != null && BCrypt.Net.BCrypt.Verify(password, admin.PasswordHash)) //--temporary removal of password check for ease of testing
+                {
+                    admin.LastLoginDate = DateTime.Now;
+                    await _context.SaveChangesAsync();
+                    return admin;
+                }
+
+                return null;
             }
             catch
             {

@@ -20,7 +20,13 @@ namespace GambianMuslimCommunity.Data
         public DbSet<AdminUser> AdminUsers { get; set; }
         public DbSet<AdminSession> AdminSessions { get; set; }
         public DbSet<AdminActivityLog> AdminActivityLogs { get; set; }
+        public DbSet<ContributionTracker> ContributionTrackers { get; set; }
         public DbSet<SiteSettings> SiteSettings { get; set; }
+        
+        // Member entities
+        public DbSet<Member> Members { get; set; }
+        public DbSet<MemberActivityLog> MemberActivityLogs { get; set; }
+        public DbSet<MembershipSettings> MembershipSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -182,6 +188,86 @@ namespace GambianMuslimCommunity.Data
                 
                 // Unique constraint
                 entity.HasIndex(e => new { e.SettingKey, e.Category }).IsUnique();
+            });
+
+            // Configure Member entity
+            modelBuilder.Entity<Member>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.FirstName).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.LastName).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Email).IsRequired().HasMaxLength(255);
+                entity.Property(e => e.PhoneNumber).IsRequired().HasMaxLength(20);
+                entity.Property(e => e.Address).HasMaxLength(255);
+                entity.Property(e => e.City).HasMaxLength(100);
+                entity.Property(e => e.State).HasMaxLength(50);
+                entity.Property(e => e.PostalCode).HasMaxLength(20);
+                entity.Property(e => e.Country).HasMaxLength(100);
+                entity.Property(e => e.Gender).IsRequired().HasMaxLength(20);
+                entity.Property(e => e.Profession).HasMaxLength(100);
+                entity.Property(e => e.Nationality).HasMaxLength(100);
+                entity.Property(e => e.MaritalStatus).HasMaxLength(50);
+                entity.Property(e => e.EmergencyContactName).HasMaxLength(100);
+                entity.Property(e => e.EmergencyContactPhone).HasMaxLength(20);
+                entity.Property(e => e.EmergencyContactRelationship).HasMaxLength(100);
+                entity.Property(e => e.MembershipStatus).IsRequired().HasMaxLength(20).HasDefaultValue("Pending");
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+                entity.Property(e => e.RegistrationDate).HasDefaultValueSql("GETDATE()");
+                entity.Property(e => e.Notes).HasMaxLength(1000);
+                entity.Property(e => e.ReceiveEmailNotifications).HasDefaultValue(true);
+                entity.Property(e => e.ReceiveSmsNotifications).HasDefaultValue(true);
+                entity.Property(e => e.PreferredLanguage).HasMaxLength(100).HasDefaultValue("English");
+                
+                // Unique constraint for email
+                entity.HasIndex(e => e.Email).IsUnique();
+                
+                // Configure relationship with AdminUser
+                entity.HasOne(m => m.ApprovedBy)
+                      .WithMany()
+                      .HasForeignKey(m => m.ApprovedById)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Configure MemberActivityLog entity
+            modelBuilder.Entity<MemberActivityLog>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Action).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.Entity).HasMaxLength(200);
+                entity.Property(e => e.Description).HasMaxLength(1000);
+                entity.Property(e => e.ActivityDate).HasDefaultValueSql("GETDATE()");
+                entity.Property(e => e.IpAddress).HasMaxLength(200);
+                
+                // Configure relationships
+                entity.HasOne(l => l.Member)
+                      .WithMany(m => m.ActivityLogs)
+                      .HasForeignKey(l => l.MemberId)
+                      .OnDelete(DeleteBehavior.Cascade);
+                      
+                entity.HasOne(l => l.AdminUser)
+                      .WithMany()
+                      .HasForeignKey(l => l.AdminUserId)
+                      .OnDelete(DeleteBehavior.SetNull);
+            });
+
+            // Configure MembershipSettings entity
+            modelBuilder.Entity<MembershipSettings>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.SettingKey).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.SettingValue).IsRequired().HasMaxLength(1000);
+                entity.Property(e => e.Description).HasMaxLength(200);
+                entity.Property(e => e.IsActive).HasDefaultValue(true);
+                entity.Property(e => e.LastModified).HasDefaultValueSql("GETDATE()");
+                
+                // Unique constraint
+                entity.HasIndex(e => e.SettingKey).IsUnique();
+                
+                // Configure relationship
+                entity.HasOne(s => s.ModifiedBy)
+                      .WithMany()
+                      .HasForeignKey(s => s.ModifiedById)
+                      .OnDelete(DeleteBehavior.SetNull);
             });
 
             // Seed initial data
@@ -365,7 +451,21 @@ namespace GambianMuslimCommunity.Data
                     CreatedBy = "System"
                 }
             );
-
+            string passwordHash = BCrypt.Net.BCrypt.HashPassword("Diaa260975");
+            modelBuilder.Entity<AdminUser>().HasData(
+              new AdminUser
+              {
+                  Id = 2,
+                  FullName = "Abou Diaby",
+                  Email = "ab.diaby@gmail.com",
+                  Username = "aboudiaby",
+                  PasswordHash = passwordHash,
+                  Role = "SuperAdmin",
+                  IsActive = true,
+                  CreatedDate = DateTime.Today.AddDays(-30),
+                  CreatedBy = "System"
+              }
+          );
             // Seed default site settings
             modelBuilder.Entity<SiteSettings>().HasData(
                 new SiteSettings { Id = 1, SettingKey = "SiteName", SettingValue = "Gambian Muslim Community in Minnesota", Category = "General", Description = "The name of the website" },
@@ -377,6 +477,9 @@ namespace GambianMuslimCommunity.Data
                 new SiteSettings { Id = 7, SettingKey = "State", SettingValue = "MN", Category = "Contact", Description = "State" },
                 new SiteSettings { Id = 8, SettingKey = "ZipCode", SettingValue = "55401", Category = "Contact", Description = "ZIP code" },
                 new SiteSettings { Id = 9, SettingKey = "ImamName", SettingValue = "Imam Abdullah Jallow", Category = "General", Description = "Name of the community imam" },
+                new SiteSettings { Id = 20, SettingKey = "ImamWelcomeMessage", SettingValue = "Assalamu Alaikum wa Rahmatullahi wa Barakatuh, dear brothers and sisters. Welcome to our vibrant Gambian Muslim Community in Minnesota. May Allah (SWT) bless you and your families as we come together to worship, learn, and support one another in faith. Our community is a place where Islamic values flourish, cultural heritage is preserved, and bonds of brotherhood and sisterhood grow stronger each day.", Category = "General", Description = "Imam's welcome message to the community" },
+                new SiteSettings { Id = 21, SettingKey = "ImamImageUrl", SettingValue = "/images/imam-placeholder.jpg", Category = "General", Description = "URL for the Imam's photo" },
+                new SiteSettings { Id = 22, SettingKey = "ImamTitle", SettingValue = "Community Imam & Spiritual Leader", Category = "General", Description = "Imam's title or position" },
                 new SiteSettings { Id = 10, SettingKey = "FacebookUrl", SettingValue = "https://facebook.com/gambianmuslimcommunity", Category = "Social", Description = "Facebook page URL" },
                 new SiteSettings { Id = 11, SettingKey = "InstagramUrl", SettingValue = "https://instagram.com/gambianmuslimmn", Category = "Social", Description = "Instagram page URL" },
                 new SiteSettings { Id = 12, SettingKey = "WhatsAppNumber", SettingValue = "+16125550123", Category = "Social", Description = "WhatsApp contact number" },

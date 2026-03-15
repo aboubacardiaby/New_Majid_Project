@@ -1,0 +1,514 @@
+@model GambianMuslimCommunity.Models.DonationSuccessViewModel
+@{
+    ViewData["Title"] = "Donation Confirmed";
+    var shareUrl = $"{Context.Request.Scheme}://{Context.Request.Host}/Home/MasjidProject/{Model.ProjectId}";
+    var shareText = Uri.EscapeDataString($"I just donated to the {Model.ProjectTitle}! Join me in supporting this blessed project.");
+}
+
+<style>
+/* ── Page shell ── */
+.success-page {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #0d2410 0%, #1a3d1e 40%, #0d2410 100%);
+    padding: 120px 0 80px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* floating geometric rings */
+.success-page::before,
+.success-page::after {
+    content: '';
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid rgba(212,175,55,.12);
+    pointer-events: none;
+}
+.success-page::before {
+    width: 700px; height: 700px;
+    top: -200px; right: -200px;
+}
+.success-page::after {
+    width: 500px; height: 500px;
+    bottom: -150px; left: -150px;
+}
+
+/* ── Check burst ── */
+.burst-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+}
+.burst {
+    width: 100px; height: 100px;
+    background: linear-gradient(135deg, #d4af37, #b8941f);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 0 16px rgba(212,175,55,.15), 0 0 0 32px rgba(212,175,55,.07);
+    animation: pulse 2.4s ease-in-out infinite;
+}
+.burst svg { width: 48px; height: 48px; }
+@@keyframes pulse {
+    0%, 100% { box-shadow: 0 0 0 16px rgba(212,175,55,.15), 0 0 0 32px rgba(212,175,55,.07); }
+    50%       { box-shadow: 0 0 0 24px rgba(212,175,55,.10), 0 0 0 48px rgba(212,175,55,.04); }
+}
+
+/* ── Card ── */
+.receipt-card {
+    max-width: 760px;
+    margin: 0 auto;
+    background: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 24px 80px rgba(0,0,0,.45);
+}
+
+/* card top strip */
+.card-header-strip {
+    background: linear-gradient(135deg, #1a3d1e 0%, #2c5530 100%);
+    padding: 44px 48px 36px;
+    text-align: center;
+    position: relative;
+}
+.card-header-strip .bismillah {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(212,175,55,.75);
+    margin-bottom: 8px;
+}
+.card-header-strip h1 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #fff;
+    margin: 0 0 6px;
+}
+.card-header-strip p {
+    font-size: 14px;
+    color: rgba(255,255,255,.65);
+    margin: 0;
+}
+.gold-bar {
+    height: 4px;
+    background: linear-gradient(90deg, #d4af37, #b8941f, #d4af37);
+}
+
+/* ── Amount hero ── */
+.amount-hero {
+    padding: 36px 48px 24px;
+    text-align: center;
+    border-bottom: 1px solid #f0ece2;
+}
+.amount-hero .label {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #aaa;
+    margin-bottom: 8px;
+}
+.amount-hero .amount {
+    font-size: 56px;
+    font-weight: 800;
+    color: #1a3d1e;
+    line-height: 1;
+}
+.amount-hero .method {
+    font-size: 14px;
+    color: #888;
+    margin-top: 8px;
+}
+
+/* ── Receipt table ── */
+.receipt-section {
+    padding: 28px 48px;
+    border-bottom: 1px solid #f0ece2;
+}
+.receipt-section h3 {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #aaa;
+    margin: 0 0 16px;
+}
+.receipt-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+.receipt-table tr + tr td { border-top: 1px solid #f0ece2; }
+.receipt-table td {
+    padding: 12px 0;
+    font-size: 14px;
+}
+.receipt-table td:first-child { color: #888; width: 44%; }
+.receipt-table td:last-child  { color: #1a3d1e; font-weight: 600; }
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #e8f5e9;
+    color: #2e7d32;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* ── Progress bar ── */
+.progress-section {
+    padding: 28px 48px;
+    border-bottom: 1px solid #f0ece2;
+}
+.progress-section h3 {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #aaa;
+    margin: 0 0 16px;
+}
+.progress-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 10px;
+}
+.progress-track {
+    height: 10px;
+    background: #f0ece2;
+    border-radius: 5px;
+    overflow: hidden;
+}
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #d4af37, #b8941f);
+    border-radius: 5px;
+    transition: width 1.2s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── Email notice ── */
+.email-notice {
+    margin: 0 48px;
+    padding: 14px 20px;
+    border-radius: 10px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.email-notice.sent {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #c8e6c9;
+}
+.email-notice.not-sent {
+    background: #fff8e1;
+    color: #856404;
+    border: 1px solid #ffe082;
+}
+
+/* ── Hadith banner ── */
+.hadith-banner {
+    margin: 28px 48px;
+    background: linear-gradient(135deg, #1a3d1e, #2c5530);
+    border-radius: 14px;
+    padding: 28px 32px;
+    text-align: center;
+}
+.hadith-banner blockquote {
+    margin: 0 0 10px;
+    font-size: 15px;
+    font-style: italic;
+    color: rgba(255,255,255,.85);
+    line-height: 1.7;
+}
+.hadith-banner cite {
+    font-size: 12px;
+    color: #d4af37;
+    font-style: normal;
+}
+
+/* ── Share section ── */
+.share-section {
+    padding: 28px 48px;
+    border-top: 1px solid #f0ece2;
+    text-align: center;
+}
+.share-section h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a3d1e;
+    margin: 0 0 16px;
+}
+.share-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.share-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity .2s, transform .2s;
+    color: #fff;
+}
+.share-btn:hover { opacity: .88; transform: translateY(-2px); color: #fff; text-decoration: none; }
+.share-btn.facebook  { background: #1877f2; }
+.share-btn.whatsapp  { background: #25d366; }
+.share-btn.twitter   { background: #1da1f2; }
+.share-btn.copy-link { background: #6c757d; cursor: pointer; border: none; }
+
+/* ── Actions footer ── */
+.card-footer {
+    padding: 28px 48px 40px;
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    background: #faf8f4;
+    border-top: 1px solid #f0ece2;
+}
+.btn-primary-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #d4af37, #b8941f);
+    color: #fff;
+    padding: 13px 28px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: opacity .2s, transform .2s;
+}
+.btn-primary-gold:hover { opacity: .88; transform: translateY(-2px); color: #fff; text-decoration: none; }
+.btn-outline-green {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: #1a3d1e;
+    border: 2px solid #1a3d1e;
+    padding: 11px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background .2s, color .2s, transform .2s;
+}
+.btn-outline-green:hover { background: #1a3d1e; color: #fff; transform: translateY(-2px); text-decoration: none; }
+
+/* copied tooltip */
+.copy-feedback {
+    display: none;
+    font-size: 12px;
+    color: #2e7d32;
+    margin-top: 8px;
+}
+
+@@media (max-width: 600px) {
+    .card-header-strip, .amount-hero, .receipt-section,
+    .progress-section, .share-section, .card-footer,
+    .hadith-banner, .email-notice { padding-left: 24px; padding-right: 24px; }
+    .email-notice { margin-left: 24px; margin-right: 24px; }
+    .hadith-banner { margin-left: 24px; margin-right: 24px; }
+    .amount-hero .amount { font-size: 40px; }
+}
+</style>
+
+<div class="success-page">
+    <div class="container" style="position:relative;z-index:1;">
+
+        <!-- Burst icon -->
+        <div class="burst-wrap">
+            <div class="burst">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Receipt card -->
+        <div class="receipt-card">
+
+            <!-- Header -->
+            <div class="card-header-strip">
+                <p class="bismillah">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</p>
+                <h1>Jazakallahu Khayran!</h1>
+                <p>Your donation has been received and recorded. May Allah (SWT) reward you abundantly.</p>
+            </div>
+            <div class="gold-bar"></div>
+
+            <!-- Amount -->
+            <div class="amount-hero">
+                <p class="label">Donation Amount</p>
+                <p class="amount">@Model.Amount.ToString("C")</p>
+                <p class="method">via @Model.PaymentMethod</p>
+            </div>
+
+            <!-- Receipt details -->
+            <div class="receipt-section">
+                <h3>Receipt Details</h3>
+                <table class="receipt-table">
+                    <tr>
+                        <td>Receipt No.</td>
+                        <td>@Model.ReceiptNumber</td>
+                    </tr>
+                    <tr>
+                        <td>Donor</td>
+                        <td>@Model.DonorName</td>
+                    </tr>
+                    <tr>
+                        <td>Project</td>
+                        <td>@Model.ProjectTitle</td>
+                    </tr>
+                    <tr>
+                        <td>Date</td>
+                        <td>@Model.DonationDate.ToString("MMMM d, yyyy 'at' h:mm tt")</td>
+                    </tr>
+                    @if (!string.IsNullOrEmpty(Model.TransactionId))
+                    {
+                        <tr>
+                            <td>Transaction ID</td>
+                            <td style="font-family:monospace;font-size:12px;">@Model.TransactionId</td>
+                        </tr>
+                    }
+                    <tr>
+                        <td>Status</td>
+                        <td>
+                            <span class="status-badge">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                Completed
+                            </span>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Project progress -->
+            @if (Model.TargetAmount > 0)
+            {
+                <div class="progress-section">
+                    <h3>Project Progress</h3>
+                    <div class="progress-meta">
+                        <span><strong style="color:#1a3d1e;">@Model.CurrentAmount.ToString("C0")</strong> raised</span>
+                        <span><strong>@Model.ProjectProgress%</strong> of @Model.TargetAmount.ToString("C0")</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+                    </div>
+                </div>
+            }
+
+            <!-- Email notice -->
+            @if (!string.IsNullOrEmpty(Model.Email))
+            {
+                if (Model.EmailSent)
+                {
+                    <div class="email-notice sent">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        A receipt email has been sent to <strong>@Model.Email</strong>
+                    </div>
+                }
+                else
+                {
+                    <div class="email-notice not-sent">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        Please save this page — we were unable to send a receipt email at this time.
+                    </div>
+                }
+            }
+
+            <!-- Hadith -->
+            <div class="hadith-banner">
+                <blockquote>
+                    "Whoever builds a mosque for Allah, Allah will build for him a house like it in Paradise."
+                </blockquote>
+                <cite>— Prophet Muhammad ﷺ &nbsp;(Bukhari &amp; Muslim)</cite>
+            </div>
+
+            <!-- Share -->
+            <div class="share-section">
+                <h3>Spread the Word &mdash; Invite Others to Donate</h3>
+                <div class="share-buttons">
+                    <a class="share-btn facebook"
+                       href="https://www.facebook.com/sharer/sharer.php?u=@Uri.EscapeDataString(shareUrl)"
+                       target="_blank" rel="noopener">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                        Facebook
+                    </a>
+                    <a class="share-btn whatsapp"
+                       href="https://wa.me/?text=@shareText%20@Uri.EscapeDataString(shareUrl)"
+                       target="_blank" rel="noopener">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                        WhatsApp
+                    </a>
+                    <a class="share-btn twitter"
+                       href="https://twitter.com/intent/tweet?text=@shareText&url=@Uri.EscapeDataString(shareUrl)"
+                       target="_blank" rel="noopener">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/></svg>
+                        Twitter
+                    </a>
+                    <button class="share-btn copy-link" onclick="copyLink()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                        Copy Link
+                    </button>
+                </div>
+                <p class="copy-feedback" id="copyFeedback">Link copied to clipboard!</p>
+            </div>
+
+            <!-- Footer actions -->
+            <div class="card-footer">
+                <a href="/Home/MasjidProject/@Model.ProjectId" class="btn-primary-gold">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    View Project
+                </a>
+                <a href="/" class="btn-outline-green">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                    Back to Home
+                </a>
+            </div>
+
+        </div><!-- /receipt-card -->
+    </div><!-- /container -->
+</div>
+
+@section Scripts {
+<script>
+// Animate progress bar on load
+document.addEventListener('DOMContentLoaded', function () {
+    var fill = document.getElementById('progressFill');
+    if (fill) {
+        setTimeout(function () {
+            fill.style.width = '@Model.ProjectProgress%';
+        }, 300);
+    }
+});
+
+function copyLink() {
+    var url = '@Html.Raw(shareUrl)';
+    navigator.clipboard.writeText(url).then(function () {
+        var fb = document.getElementById('copyFeedback');
+        fb.style.display = 'block';
+        setTimeout(function () { fb.style.display = 'none'; }, 3000);
+    });
+}
+</script>
+}

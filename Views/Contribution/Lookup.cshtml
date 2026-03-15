@@ -1,0 +1,137 @@
+@{
+    ViewData["Title"] = "Contribution Lookup";
+}
+
+<section class="contribution-lookup">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="lookup-card">
+                    <div class="card-header text-center">
+                        <i class="fas fa-search-dollar fa-3x text-primary mb-3"></i>
+                        <h2>Track Your Contributions</h2>
+                        <p class="text-muted">Enter your email address to view your contribution history and impact</p>
+                    </div>
+                    
+                    <div class="card-body">
+                        <form asp-action="Lookup" method="post">
+                            @Html.AntiForgeryToken()
+                            
+                            <div class="form-group mb-4">
+                                <label for="email" class="form-label">Email Address</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-envelope"></i>
+                                    </span>
+                                    <input type="email" id="email" name="email" class="form-control form-control-lg" 
+                                           placeholder="Enter your email address" required />
+                                </div>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    Enter the email address you used when making donations
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="fas fa-search me-2"></i>
+                                View My Contributions
+                            </button>
+                        </form>
+                    </div>
+                    
+                    <div class="card-footer text-center">
+                        <small class="text-muted">
+                            <i class="fas fa-shield-alt"></i>
+                            Your information is secure and private
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="features-section mt-5">
+                    <h4 class="text-center mb-4">What You Can Track</h4>
+                    <div class="row">
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="fas fa-chart-line fa-2x text-success mb-2"></i>
+                            <h6>Contribution History</h6>
+                            <small class="text-muted">View all your donations and their impact</small>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="fas fa-trophy fa-2x text-warning mb-2"></i>
+                            <h6>Recognition Level</h6>
+                            <small class="text-muted">See your community recognition status</small>
+                        </div>
+                        <div class="col-md-4 text-center mb-3">
+                            <i class="fas fa-calendar-alt fa-2x text-info mb-2"></i>
+                            <h6>Monthly Trends</h6>
+                            <small class="text-muted">Track your giving patterns over time</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.contribution-lookup {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    min-height: 100vh;
+    padding: 80px 0;
+}
+
+.lookup-card {
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: none;
+    overflow: hidden;
+}
+
+.lookup-card .card-header {
+    background: linear-gradient(135deg, var(--primary-color), #1a3d1e);
+    color: white;
+    padding: 40px 30px;
+    border: none;
+}
+
+.lookup-card .card-body {
+    padding: 40px 30px;
+}
+
+.lookup-card .card-footer {
+    background: #f8f9fa;
+    border: none;
+    padding: 20px 30px;
+}
+
+.input-group-text {
+    background: var(--light-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
+}
+
+.form-control-lg {
+    height: 50px;
+    font-size: 1.1rem;
+}
+
+.btn-primary {
+    background: var(--gradient-primary);
+    border: none;
+    height: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(44, 85, 48, 0.3);
+}
+
+.features-section {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+}
+</style>

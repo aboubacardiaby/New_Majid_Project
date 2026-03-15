@@ -1,0 +1,256 @@
+@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "Community Members Directory";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<main class="main-content">
+    <!-- Hero Section -->
+    <section class="hero-section bg-gradient py-5" style="background: linear-gradient(135deg, #1a4c5c 0%, #2d6e42 100%);">
+        <div class="container">
+            <div class="row justify-content-center text-center">
+                <div class="col-lg-8">
+                    <h1 class="text-white mb-4" style="font-size: 2.5rem; font-weight: 700;">
+                        <i class="fas fa-users text-success me-3"></i>
+                        Community Members Directory
+                    </h1>
+                    <p class="text-white-75 mb-0" style="font-size: 1.1rem; opacity: 0.9;">
+                        Meet our active community members who are part of our growing Islamic family in Minnesota
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Members Directory Section -->
+    <section class="py-5" style="background-color: #f8f9fa;">
+        <div class="container">
+            <div class="row">
+                @if (Model.Any())
+                {
+                    @foreach (var member in Model)
+                    {
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="member-card card h-100 border-0 shadow-sm">
+                                <div class="card-body text-center p-4">
+                                    <!-- Member Avatar -->
+                                    <div class="member-avatar mx-auto mb-3">
+                                        @member.FirstName.Substring(0, 1)@member.LastName.Substring(0, 1)
+                                    </div>
+                                    
+                                    <!-- Member Info -->
+                                    <h5 class="card-title text-primary mb-2">@member.FirstName @member.LastName</h5>
+                                    
+                                    <div class="member-details">
+                                        @if (!string.IsNullOrEmpty(member.Profession))
+                                        {
+                                            <p class="text-muted mb-2">
+                                                <i class="fas fa-briefcase me-2"></i>
+                                                @member.Profession
+                                            </p>
+                                        }
+                                        
+                                        @if (!string.IsNullOrEmpty(member.City) || !string.IsNullOrEmpty(member.State) || !string.IsNullOrEmpty(member.Country))
+                                        {
+                                            <p class="text-muted mb-2">
+                                                <i class="fas fa-map-marker-alt me-2"></i>
+                                                @if (!string.IsNullOrEmpty(member.City))
+                                                {
+                                                    @member.City
+                                                    if (!string.IsNullOrEmpty(member.State) || !string.IsNullOrEmpty(member.Country))
+                                                    {
+                                                        <text>, </text>
+                                                    }
+                                                }
+                                                @if (!string.IsNullOrEmpty(member.State))
+                                                {
+                                                    @member.State
+                                                    if (!string.IsNullOrEmpty(member.Country))
+                                                    {
+                                                        <text>, </text>
+                                                    }
+                                                }
+                                                @member.Country
+                                            </p>
+                                        }
+                                        
+                                        @if (!string.IsNullOrEmpty(member.Nationality))
+                                        {
+                                            <p class="text-muted mb-2">
+                                                <i class="fas fa-flag me-2"></i>
+                                                @member.Nationality
+                                            </p>
+                                        }
+                                    </div>
+                                    
+                                    <!-- Member Since -->
+                                    @if (member.ApprovedDate != null)
+                                    {
+                                        <div class="member-since mt-3 pt-3 border-top">
+                                            <small class="text-success fw-bold">
+                                                <i class="fas fa-calendar-check me-1"></i>
+                                                Member since @((DateTime)member.ApprovedDate).ToString("MMMM yyyy")
+                                            </small>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12">
+                        <div class="text-center py-5">
+                            <i class="fas fa-users fa-4x text-muted mb-4"></i>
+                            <h4 class="text-muted">No Members Yet</h4>
+                            <p class="text-muted mb-4">Be the first to join our growing community!</p>
+                            <a href="/Membership/Register" class="btn btn-primary btn-lg">
+                                <i class="fas fa-user-plus me-2"></i>
+                                Join Our Community
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+            
+            @if (Model.Any())
+            {
+                <!-- Join Community CTA -->
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <div class="text-center bg-white rounded shadow-sm p-5">
+                            <h4 class="text-primary mb-3">Want to Join Our Community?</h4>
+                            <p class="text-muted mb-4">
+                                Become part of our vibrant Islamic community in Minnesota. Register today to connect with fellow Muslims, 
+                                participate in community events, and contribute to our masjid building project.
+                            </p>
+                            <div class="d-flex justify-content-center gap-3 flex-wrap">
+                                <a href="/Membership/Register" class="btn btn-success btn-lg">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Register Now
+                                </a>
+                                <a href="/Membership/Status" class="btn btn-outline-primary btn-lg">
+                                    <i class="fas fa-search me-2"></i>
+                                    Check Status
+                                </a>
+                                <a href="/" class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-home me-2"></i>
+                                    Back to Home
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </section>
+</main>
+
+<style>
+    .member-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+    
+    .member-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(0,0,0,0.1) !important;
+    }
+    
+    .member-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.5rem;
+        text-transform: uppercase;
+        border: 4px solid #e8f5e8;
+    }
+    
+    .hero-section {
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('/images/islamic-pattern.png') repeat;
+        opacity: 0.1;
+        z-index: 0;
+    }
+    
+    .hero-section > .container {
+        position: relative;
+        z-index: 1;
+    }
+    
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.75);
+    }
+    
+    .member-details p {
+        font-size: 0.95rem;
+    }
+    
+    .member-details i {
+        color: #28a745;
+        width: 18px;
+        text-align: center;
+    }
+    
+    @@media (max-width: 768px) {
+        .hero-section h1 {
+            font-size: 2rem !important;
+        }
+        
+        .member-avatar {
+            width: 60px;
+            height: 60px;
+            font-size: 1.2rem;
+        }
+        
+        .d-flex.gap-3 {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .d-flex.gap-3 .btn {
+            width: 100%;
+            max-width: 250px;
+        }
+    }
+    
+    /* Card hover effects */
+    .member-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        transform: scaleX(0);
+        transform-origin: left;
+        transition: transform 0.3s ease;
+    }
+    
+    .member-card:hover::before {
+        transform: scaleX(1);
+    }
+    
+    .member-card {
+        position: relative;
+    }
+</style>

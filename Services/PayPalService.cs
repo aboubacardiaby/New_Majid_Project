@@ -1,4 +1,5 @@
 using GambianMuslimCommunity.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using PayPal.Api;
 
@@ -8,11 +9,14 @@ namespace GambianMuslimCommunity.Services
     {
         private readonly PayPalSettings _settings;
         private readonly ILogger<PayPalService> _logger;
+        private readonly IMemoryCache _cache;
+        private const string TokenCacheKey = "PayPal_AccessToken";
 
-        public PayPalService(IOptions<PayPalSettings> settings, ILogger<PayPalService> logger)
+        public PayPalService(IOptions<PayPalSettings> settings, ILogger<PayPalService> logger, IMemoryCache cache)
         {
             _settings = settings.Value;
             _logger = logger;
+            _cache = cache;
         }
 
         public APIContext GetAPIContext()
@@ -24,7 +28,14 @@ namespace GambianMuslimCommunity.Services
                 { "clientSecret", _settings.ClientSecret }
             };
 
-            var accessToken = new OAuthTokenCredential(_settings.ClientId, _settings.ClientSecret, config).GetAccessToken();
+            var accessToken = _cache.GetOrCreate(TokenCacheKey, entry =>
+            {
+                // PayPal tokens are valid for ~9 hours; refresh at 8 hours to be safe
+                entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(8);
+                _logger.LogInformation("Fetching new PayPal OAuth token");
+                return new OAuthTokenCredential(_settings.ClientId, _settings.ClientSecret, config).GetAccessToken();
+            });
+
             return new APIContext(accessToken)
             {
                 Config = config

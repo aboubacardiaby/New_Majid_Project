@@ -15,6 +15,8 @@ builder.Services.Configure<PayPalSettings>(builder.Configuration.GetSection("Pay
 builder.Services.AddScoped<ICommunityService, CommunityService>();
 builder.Services.AddScoped<IPayPalService, PayPalService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IContributionTrackerService, ContributionTrackerService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Add authentication
 builder.Services.AddAuthentication("AdminCookies")
@@ -30,6 +32,7 @@ builder.Services.AddAuthentication("AdminCookies")
         options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
     });
 
+builder.Services.AddMemoryCache();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
